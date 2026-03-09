@@ -36,3 +36,8 @@ Documento com as 9 histórias de usuário e critérios de aceitação em BDD (Da
 
 Protótipos de baixa fidelidade no Figma cobrindo 5 histórias:
 [Acessar no Figma](https://www.figma.com/design/j0wEhFfWl55RNM137RW6rR/ORGANIZEI_Lo-Fi?node-id=0-1&t=34MYVU5atat7Rbxn-1)
+
+### Screencast — Protótipo Lo-Fi
+
+Apresentação do protótipo com áudio e legenda:
+[Assistir no YouTube](https://youtu.be/Zczpt72Q_2E?si=VJMHFXdOuRB59eok)
