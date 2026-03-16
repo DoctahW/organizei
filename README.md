@@ -40,4 +40,4 @@ Protótipos de baixa fidelidade no Figma cobrindo 5 histórias:
 ### Screencast — Protótipo Lo-Fi
 
 Apresentação do protótipo com áudio e legenda:
-[Assistir no YouTube](https://youtu.be/Zczpt72Q_2E?si=VJMHFXdOuRB59eok)
+[Assistir no YouTube](https://youtu.be/tkBOIxoyT6g)
