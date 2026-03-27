@@ -1,0 +1,390 @@
+/* =============================================
+   RESET & BASE
+   ============================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  background: #f5f5f7;
+  color: #303048;
+}
+
+/* =============================================
+   NAVBAR
+   ============================================= */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid #efeff1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 24px;
+  gap: 16px;
+}
+
+.navbar__brand {
+  font-size: 17px;
+  font-weight: 900;
+  color: #303048;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Nav links — horizontal on desktop */
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__link {
+  text-decoration: none;
+  color: #879a88;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 10px;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.navbar__link:hover {
+  background: #f5f5f7;
+  color: #303048;
+}
+
+.navbar__link--active {
+  background: #494655;
+  color: #fff;
+}
+
+.navbar__link--active:hover {
+  background: #383545;
+  color: #fff;
+}
+
+/* Hamburger button — hidden on desktop */
+.navbar__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.navbar__toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #303048;
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+  transform-origin: center;
+}
+
+/* Hamburger → X animation */
+.navbar__toggle--open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.navbar__toggle--open span:nth-child(2) { opacity: 0; }
+.navbar__toggle--open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+
+/* =============================================
+   PAGE CONTENT
+   ============================================= */
+
+.page-content {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.page-header__title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #303048;
+  margin: 0;
+}
+
+/* =============================================
+   BUTTONS
+   ============================================= */
+
+.btn-primary {
+  display: inline-block;
+  background: #494655;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover { background: #383545; }
+
+/* =============================================
+   MESSAGES
+   ============================================= */
+
+.messages {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.messages li {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 8px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* =============================================
+   SUMMARY CARDS
+   ============================================= */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid #efeff1;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(34, 24, 63, 0.05);
+  padding: 20px 24px;
+}
+
+.summary-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #879a88;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 6px;
+}
+
+.summary-card__value {
+  font-size: 24px;
+  font-weight: 900;
+  color: #303048;
+  margin: 0;
+}
+
+/* =============================================
+   GOAL CARDS — GRID
+   ============================================= */
+
+.goal-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.goal-card {
+  background: #fff;
+  border: 1px solid #efeff1;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(34, 24, 63, 0.05);
+  padding: 20px 22px 18px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.goal-card:hover {
+  box-shadow: 0 8px 32px rgba(34, 24, 63, 0.12);
+  transform: translateY(-2px);
+}
+
+.goal-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.goal-card__name-row {
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.goal-card__label { color: #c7c4be; }
+
+.goal-card__name {
+  color: #303048;
+  font-weight: 500;
+}
+
+.goal-card__target {
+  font-size: 14px;
+  font-weight: 700;
+  color: #303048;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.goal-card__percent {
+  font-size: 12px;
+  color: #879a88;
+  margin: 8px 0 0;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 7px;
+  border-radius: 100px;
+  background: #d9d9d9;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(to right, #c7c4be, #8d8a97);
+  transition: width 0.4s ease;
+}
+
+.goal-card--completed .progress-bar__fill {
+  background: linear-gradient(to right, #8d8a97, #494655);
+}
+
+.badge-completed {
+  font-size: 11px;
+  background: #494655;
+  color: #fff;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Empty state */
+.goals-empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: #879a88;
+  grid-column: 1 / -1;
+}
+
+.goals-empty p {
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+/* =============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================= */
+
+/* Tablet — 2 columns */
+@media (max-width: 1024px) {
+  .goal-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .summary-grid .summary-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobile — hamburger menu, 1 column */
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0 16px;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 60px;
+  }
+
+  /* Show hamburger, hide links by default */
+  .navbar__toggle {
+    display: flex;
+  }
+
+  .navbar__links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    padding: 8px 0 12px;
+    gap: 2px;
+    order: 3;
+  }
+
+  .navbar__links--open {
+    display: flex;
+  }
+
+  .navbar__link {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  /* Page content */
+  .page-content {
+    padding: 20px 16px 40px;
+  }
+
+  .page-header__title {
+    font-size: 20px;
+  }
+
+  /* Summary: single column stack */
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid .summary-card:last-child {
+    grid-column: auto;
+  }
+
+  .summary-card {
+    padding: 16px 18px;
+  }
+
+  .summary-card__value {
+    font-size: 20px;
+  }
+
+  /* Goal cards: single column */
+  .goal-list {
+    grid-template-columns: 1fr;
+  }
+}

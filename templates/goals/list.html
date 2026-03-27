@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Metas — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<nav class="navbar">
+  <a href="/" class="navbar__brand">Organizei</a>
+
+  <ul class="navbar__links" id="navLinks">
+    <li><a href="/" class="navbar__link">Dashboard</a></li>
+    <li><a href="{% url 'goals:list' %}" class="navbar__link navbar__link--active">Metas</a></li>
+    <li><a href="/transacoes/" class="navbar__link">Gastos</a></li>
+    <li><a href="/investimentos/" class="navbar__link">Investimentos</a></li>
+    <li><a href="/assinaturas/" class="navbar__link">Assinaturas</a></li>
+  </ul>
+
+  <button class="navbar__toggle" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page-content">
+
+  <div class="page-header">
+    <h1 class="page-header__title">Metas</h1>
+    <a href="{% url 'goals:create' %}" class="btn-primary">+ Nova Meta</a>
+  </div>
+
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <p class="summary-card__label">Meta Total</p>
+      <p class="summary-card__value">R$ {{ total_target|floatformat:2 }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="summary-card__label">Acumulado</p>
+      <p class="summary-card__value">R$ {{ total_saved|floatformat:2 }}</p>
+    </div>
+    <div class="summary-card">
+      <p class="summary-card__label">Metas ativas</p>
+      <p class="summary-card__value">{{ goals.count }}</p>
+    </div>
+  </div>
+
+  <div class="goal-list">
+    {% for goal in goals %}
+    <a href="{% url 'goals:detail' goal.pk %}" class="goal-card {% if goal.is_completed %}goal-card--completed{% endif %}">
+      <div class="goal-card__top">
+        <p class="goal-card__name-row">
+          <span class="goal-card__label">Meta: </span>
+          <span class="goal-card__name">{{ goal.name }}</span>
+          {% if goal.is_completed %}<span class="badge-completed">Concluída</span>{% endif %}
+        </p>
+        <p class="goal-card__target">R$ {{ goal.target_amount|floatformat:2 }}</p>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-bar__fill" style="width: {{ goal.progress_percent }}%;"></div>
+      </div>
+      <p class="goal-card__percent">{{ goal.progress_percent }}% concluído</p>
+    </a>
+    {% empty %}
+    <div class="goals-empty">
+      <p>Nenhuma meta cadastrada ainda.</p>
+      <a href="{% url 'goals:create' %}" class="btn-primary">Criar minha primeira meta</a>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+  const toggle = document.getElementById('navToggle');
+  const links  = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => {
+    links.classList.toggle('navbar__links--open');
+    toggle.classList.toggle('navbar__toggle--open');
+  });
+</script>
+{% endblock %}
+
+{% endblock %}

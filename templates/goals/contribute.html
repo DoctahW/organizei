@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Contribuir — {{ goal.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-page {
+    background: #fff;
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid #efeff1;
+  }
+  .form-header__back {
+    color: #303048;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  .form-header__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #303048;
+    margin: 0;
+  }
+  .form-header__spacer { width: 24px; }
+
+  /* Progress bar summary */
+  .contribute-summary {
+    padding: 16px 16px 0;
+  }
+  .contribute-summary__name {
+    font-size: 14px;
+    color: #879a88;
+    margin: 0 0 6px;
+  }
+  .contribute-summary__progress-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .contribute-summary__percent {
+    font-size: 13px;
+    color: #8d8a97;
+    font-weight: 600;
+  }
+  .contribute-summary__values {
+    font-size: 13px;
+    color: #879a88;
+  }
+  .progress-bar {
+    height: 7px;
+    border-radius: 100px;
+    background: #d9d9d9;
+    overflow: hidden;
+  }
+  .progress-bar__fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(to right, #c7c4be, #8d8a97);
+  }
+
+  .form-body {
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #303048;
+  }
+  .field input {
+    border: 1px solid #efeff1;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #303048;
+    outline: none;
+    background: #fefefe;
+    font-family: inherit;
+  }
+  .field input:focus { border-color: #8d8a97; }
+  .field .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    color: #c0392b;
+  }
+  .btn-submit {
+    background: #494655;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 8px;
+  }
+  .btn-submit:hover { background: #383545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+
+  <header class="form-header">
+    <a href="{% url 'goals:detail' goal.pk %}" class="form-header__back">&#8249;</a>
+    <h1 class="form-header__title">Contribuir</h1>
+    <span class="form-header__spacer"></span>
+  </header>
+
+  <div class="contribute-summary">
+    <p class="contribute-summary__name">Meta: {{ goal.name }}</p>
+    <div class="contribute-summary__progress-row">
+      <span class="contribute-summary__percent">{{ goal.progress_percent }}% concluído</span>
+      <span class="contribute-summary__values">R$ {{ goal.current_amount|floatformat:2 }} / R$ {{ goal.target_amount|floatformat:2 }}</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-bar__fill" style="width: {{ goal.progress_percent }}%;"></div>
+    </div>
+  </div>
+
+  <form method="post" class="form-body">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="field">
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.errors %}{{ field.errors }}{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn-submit">Registrar contribuição</button>
+  </form>
+
+</div>
+{% endblock %}

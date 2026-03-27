@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}{{ goal.name }} — Organizei{% endblock %}
+
+{% block extra_css %}
+<style>
+  .detail-page {
+    background: #fff;
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid #efeff1;
+  }
+  .detail-header__back {
+    color: #303048;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  .detail-header__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #303048;
+    margin: 0;
+  }
+  .detail-header__spacer { width: 24px; }
+
+  .detail-body { padding: 20px 16px; }
+
+  /* Progress section */
+  .progress-section {
+    background: #fefefe;
+    border: 1px solid #efeff1;
+    border-radius: 18px;
+    box-shadow: 0 20px 40px -10px rgba(34, 24, 63, 0.06);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .progress-section__row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .progress-section__label {
+    font-size: 14px;
+    color: #879a88;
+  }
+  .progress-section__value {
+    font-size: 14px;
+    color: #303048;
+    font-weight: 600;
+  }
+  .progress-section__percent {
+    font-size: 32px;
+    font-weight: 900;
+    color: #303048;
+    margin: 12px 0 8px;
+  }
+  .progress-bar {
+    height: 10px;
+    border-radius: 100px;
+    background: #d9d9d9;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .progress-bar__fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(to right, #c7c4be, #494655);
+    transition: width 0.3s ease;
+  }
+  .progress-section__deadline {
+    font-size: 13px;
+    color: #879a88;
+    margin: 0;
+  }
+
+  /* Completed banner */
+  .completed-banner {
+    background: #494655;
+    color: #fff;
+    border-radius: 14px;
+    padding: 16px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  /* Contribute button */
+  .btn-contribute {
+    display: block;
+    background: #494655;
+    color: #fff;
+    text-align: center;
+    padding: 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .btn-contribute:hover { background: #383545; }
+
+  /* Contributions list */
+  .contributions-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #303048;
+    margin: 0 0 12px;
+  }
+  .contribution-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #efeff1;
+  }
+  .contribution-item:last-child { border-bottom: none; }
+  .contribution-item__date { font-size: 13px; color: #879a88; }
+  .contribution-item__amount { font-size: 15px; font-weight: 600; color: #303048; }
+
+  .no-contributions {
+    font-size: 14px;
+    color: #c7c4be;
+    text-align: center;
+    padding: 20px 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+
+  <header class="detail-header">
+    <a href="{% url 'goals:list' %}" class="detail-header__back">&#8249;</a>
+    <h1 class="detail-header__title">{{ goal.name }}</h1>
+    <span class="detail-header__spacer"></span>
+  </header>
+
+  <div class="detail-body">
+
+    <!-- Progress section -->
+    <div class="progress-section">
+      <div class="progress-section__row">
+        <span class="progress-section__label">Acumulado</span>
+        <span class="progress-section__value">R$ {{ goal.current_amount|floatformat:2 }}</span>
+      </div>
+      <div class="progress-section__row">
+        <span class="progress-section__label">Alvo</span>
+        <span class="progress-section__value">R$ {{ goal.target_amount|floatformat:2 }}</span>
+      </div>
+      <p class="progress-section__percent">{{ goal.progress_percent }}%</p>
+      <div class="progress-bar">
+        <div class="progress-bar__fill" style="width: {% if goal.progress_percent > 0 %}max({{ goal.progress_percent }}%, 2%){% else %}0%{% endif %};"></div>
+      </div>
+      <p class="progress-section__deadline">Data limite: {{ goal.deadline|date:"d/m/Y" }}</p>
+    </div>
+
+    {% if goal.is_completed %}
+    <div class="completed-banner">🎉 Meta concluída! Parabéns!</div>
+    {% else %}
+    <a href="{% url 'goals:contribute' goal.pk %}" class="btn-contribute">+ Registrar contribuição</a>
+    {% endif %}
+
+    <!-- Contributions -->
+    <p class="contributions-title">Histórico de contribuições</p>
+    {% for contribution in contributions %}
+    <div class="contribution-item">
+      <span class="contribution-item__date">{{ contribution.date|date:"d/m/Y" }}</span>
+      <span class="contribution-item__amount">R$ {{ contribution.amount|floatformat:2 }}</span>
+    </div>
+    {% empty %}
+    <p class="no-contributions">Nenhuma contribuição ainda.</p>
+    {% endfor %}
+
+  </div>
+</div>
+{% endblock %}
