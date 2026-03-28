@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Transações — Organizei{% endblock %}
+
+{% block content %}
+
+<section class="new_transaction">
+    <h2>Criar Nova Transação</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Criar Transação</button>
+    </form>
+</section>
+{% endblock%}
