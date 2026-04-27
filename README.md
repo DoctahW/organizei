@@ -144,11 +144,11 @@ Foram selecionadas 4 histórias para implementação nesta entrega:
 
 ### Screencast com as histórias implementadas
 
-[Link para o vídeo screencast]()
+[Link para o vídeo screencast](https://youtu.be/yD7eFAaO51A)
 
 #### Screencast testando as histórias implementadas via testes E2E:
 
-[Link]()
+[Link](https://youtu.be/DgT2rhwJekw)
 
 ### Programação em par (atualização)
 
