@@ -6,14 +6,16 @@ from datetime import date
 from apps.transactions.models import Transaction
 from decimal import Decimal
 
+from .services import validate_budget_data
+
 @login_required
 def set_budget(request):
+    errors = {}
     if request.method == 'POST':
-        limit = request.POST.get('limit')
+        data = {"limit": request.POST.get('limit')}
+        errors, limit = validate_budget_data(data)
 
-        if limit:
-            limit = Decimal(limit)
-
+        if not errors:
             today = date.today()
             month_start = date(today.year, today.month, 1)
 
@@ -25,7 +27,7 @@ def set_budget(request):
 
             return redirect('budget:list')
 
-    return render(request, 'budget/set_budget.html')
+    return render(request, 'budget/set_budget.html', {'errors': errors})
 
 @login_required
 def budget_view(request):
