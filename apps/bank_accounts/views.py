@@ -3,9 +3,19 @@ from django.contrib.auth.decorators import login_required
 from .models import Conta, Bank
 
 
+from django.db.models import Sum, Q
+from django.db.models.functions import Coalesce
+from decimal import Decimal
+
 @login_required
 def accounts_list(request):
-    contas = Conta.objects.filter(usuario=request.user).select_related("bank")
+    contas = Conta.objects.filter(usuario=request.user).select_related("bank").annotate(
+        total_deposits=Coalesce(Sum('transaction__value', filter=Q(transaction__transaction_type='DEPOSIT')), Decimal('0')),
+        total_withdrawals=Coalesce(Sum('transaction__value', filter=Q(transaction__transaction_type='WITHDRAWAL')), Decimal('0'))
+    )
+    for conta in contas:
+        conta.balance = conta.total_deposits - conta.total_withdrawals
+
     return render(request, 'bank_accounts/myaccounts.html', {
         'contas': contas,
     })
