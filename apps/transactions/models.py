@@ -45,6 +45,13 @@ class Transaction(models.Model):
         blank=True,
         verbose_name="Categoria",
     )
+    conta = models.ForeignKey(
+        'bank_accounts.Conta',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Conta Bancária",
+    )
     date = models.DateField(auto_now_add=True, verbose_name="Data")
 
     def __str__(self):

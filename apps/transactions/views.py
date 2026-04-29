@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.dateformat import format as date_fmt
 from .models import Transaction, Category
 from django.db.models import Sum, Q
+from apps.bank_accounts.models import Conta
 
 def _get_categories_for_user(user):
     return Category.objects.filter(Q(user=None) | Q(user=user)).order_by('name')
@@ -18,12 +19,14 @@ def _build_create_transaction_context(user, form_data=None, errors=None):
         s=Sum('value', filter=Q(transaction_type='WITHDRAWAL'))
     )
     account_balance = (totais['e'] or 0) - (totais['s'] or 0)
+    contas = Conta.objects.filter(usuario=user)
     return {
         'form_data': form_data or {},
         'errors': errors or {},
         'account_balance': account_balance,
         'transaction_type_choices': Transaction.TYPE_CHOICES,
         'categories': _get_categories_for_user(user),
+        'contas': contas,
     }
 
 
@@ -41,6 +44,7 @@ def create_transactions(request):
             'transaction_type': request.POST.get('transaction_type', '').strip(),
             'value': request.POST.get('value', '').strip(),
             'category_id': request.POST.get('category_id', '').strip(),
+            'conta_id': request.POST.get('conta_id', '').strip(),
         }
         errors = {}
 
@@ -60,6 +64,13 @@ def create_transactions(request):
             except Category.DoesNotExist:
                 errors['category_id'] = 'Selecione uma categoria válida.'
 
+        conta = None
+        if form_data['conta_id']:
+            try:
+                conta = Conta.objects.filter(usuario=request.user).get(pk=form_data['conta_id'])
+            except Conta.DoesNotExist:
+                errors['conta_id'] = 'Selecione uma conta bancária válida.'
+
         raw_value = form_data['value'].replace(',', '.')
         try:
             parsed_value = Decimal(raw_value)
@@ -76,6 +87,7 @@ def create_transactions(request):
                 transaction_type=form_data['transaction_type'],
                 value=parsed_value,
                 category=category,
+                conta=conta,
             )
             return redirect('transactions:list')
 
@@ -165,6 +177,7 @@ def edit_transaction(request, pk):
             'transaction_type': request.POST.get('transaction_type', '').strip(),
             'value': request.POST.get('value', '').strip(),
             'category_id': request.POST.get('category_id', '').strip(),
+            'conta_id': request.POST.get('conta_id', '').strip(),
         }
         errors = {}
  
@@ -183,6 +196,13 @@ def edit_transaction(request, pk):
                 category = _get_categories_for_user(request.user).get(pk=form_data['category_id'])
             except Category.DoesNotExist:
                 errors['category_id'] = 'Selecione uma categoria válida.'
+
+        conta = None
+        if form_data['conta_id']:
+            try:
+                conta = Conta.objects.filter(usuario=request.user).get(pk=form_data['conta_id'])
+            except Conta.DoesNotExist:
+                errors['conta_id'] = 'Selecione uma conta bancária válida.'
  
         raw_value = form_data['value'].replace(',', '.')
         try:
@@ -198,6 +218,7 @@ def edit_transaction(request, pk):
             transaction.transaction_type = form_data['transaction_type']
             transaction.value = parsed_value
             transaction.category = category
+            transaction.conta = conta
             transaction.save()
             return redirect('transactions:list')
  
@@ -209,6 +230,7 @@ def edit_transaction(request, pk):
         'transaction_type': transaction.transaction_type,
         'value': str(transaction.value).replace('.', ','),
         'category_id': str(transaction.category.pk) if transaction.category else '',
+        'conta_id': str(transaction.conta.pk) if transaction.conta else '',
     }
     context = _build_edit_transaction_context(request.user, transaction, form_data=form_data)
     return render(request, 'transactions/edit_transaction.html', context)
@@ -221,6 +243,7 @@ def _build_edit_transaction_context(user, transaction, form_data=None, errors=No
         s=Sum('value', filter=Q(transaction_type='WITHDRAWAL'))
     )
     account_balance = (totais['e'] or 0) - (totais['s'] or 0)
+    contas = Conta.objects.filter(usuario=user)
     return {
         'transaction': transaction,
         'form_data': form_data or {},
@@ -228,6 +251,7 @@ def _build_edit_transaction_context(user, transaction, form_data=None, errors=No
         'account_balance': account_balance,
         'transaction_type_choices': Transaction.TYPE_CHOICES,
         'categories': _get_categories_for_user(user),
+        'contas': contas,
     }
  
  
