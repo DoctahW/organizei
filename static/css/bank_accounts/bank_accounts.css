@@ -42,7 +42,7 @@ body {
 
 .account-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 16px;
     padding: 18px 20px;
@@ -118,6 +118,19 @@ body {
 .account-number {
     color: #f0f0f0;
     font-weight: 600;
+}
+
+.account-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 0 0 auto;
+}
+
+.account-balance {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-primary);
 }
 
 .account-delete-form {
