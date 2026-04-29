@@ -71,3 +71,69 @@ class BudgetE2ETest(E2EBaseTest):
         self.assertIn("bg-danger", classes)
         body_text = self.driver.find_element(By.TAG_NAME, "body").text
         self.assertIn("ultrapassado", body_text.lower())
+
+    def test_missing_limit_shows_validation_error(self):
+        """Submitting an empty budget limit shows a validation error."""
+        self.goto("budget:set_budget")
+        
+        self.driver.execute_script(
+            "document.getElementById('limit').removeAttribute('required');"
+        )
+        
+        limit_input = self.driver.find_element(By.ID, "limit")
+        limit_input.clear()
+        
+        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+
+        self.wait().until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'O limite é obrigatório')]")
+            )
+        )
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        self.assertIn("O limite é obrigatório", body_text)
+
+    def test_negative_limit_shows_validation_error(self):
+        """Submitting a negative budget limit shows a validation error."""
+        self.goto("budget:set_budget")
+        
+        limit_input = self.driver.find_element(By.ID, "limit")
+        limit_input.clear()
+        
+        self.driver.execute_script(
+            "var el = document.getElementById('limit');"
+            "el.removeAttribute('min');"
+            "el.value = '-50';"
+        )
+        
+        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+
+        self.wait().until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'O limite deve ser maior que zero')]")
+            )
+        )
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        self.assertIn("O limite deve ser maior que zero", body_text)
+
+    def test_invalid_limit_format_shows_validation_error(self):
+        """Submitting an invalid number format shows a validation error."""
+        self.goto("budget:set_budget")
+        
+        self.driver.execute_script(
+            "document.getElementById('limit').type = 'text';"
+        )
+        
+        limit_input = self.driver.find_element(By.ID, "limit")
+        limit_input.clear()
+        limit_input.send_keys("abc")
+        
+        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+
+        self.wait().until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'Informe um valor válido')]")
+            )
+        )
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        self.assertIn("Informe um valor válido", body_text)
