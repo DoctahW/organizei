@@ -40,6 +40,10 @@
                     </div>
                 </div>
 
+                {% if errors.limit %}
+                <p class="form-error">{{ errors.limit }}</p>
+                {% endif %}
+
                 <div class="budget-form-actions">
                     <a href="{% url 'budget:list' %}" class="button-glass">Cancelar</a>
                     <button type="submit" class="button-glass button-glass--primary">Salvar</button>

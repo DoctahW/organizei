@@ -53,6 +53,12 @@
             </label>
           </div>
 
+          {% if errors %}
+          <ul class="form-errors">
+            {% for error in errors.values %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+
           <div class="manual-actions">
             <a href="{% url 'bank_accounts' %}" class="button-glass button-glass--secondary">Cancelar</a>
             <button type="submit" class="button-glass button-glass--active">Confirmar</button>

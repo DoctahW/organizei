@@ -11,11 +11,21 @@ VALID_PERIODS = {"1M", "6M", "1A", "ALL"}
 @login_required
 def dashboard_home(request):
     context = build_dashboard_context(request.user)
+    from django.db.models import Sum, Q
+    from django.db.models.functions import Coalesce
+    from decimal import Decimal
+
     registered_accounts = list(
         Conta.objects.filter(usuario=request.user)
         .select_related("bank")
+        .annotate(
+            total_deposits=Coalesce(Sum('transaction__value', filter=Q(transaction__transaction_type='DEPOSIT')), Decimal('0')),
+            total_withdrawals=Coalesce(Sum('transaction__value', filter=Q(transaction__transaction_type='WITHDRAWAL')), Decimal('0'))
+        )
         .order_by("-id")[:4]
     )
+    for conta in registered_accounts:
+        conta.balance = conta.total_deposits - conta.total_withdrawals
     context["registered_accounts"] = registered_accounts
     context["registered_accounts_total"] = len(registered_accounts)
     context["registered_accounts_has_more"] = (

@@ -72,3 +72,70 @@ class TransactionsE2ETest(E2EBaseTest):
         )
         body_text = self.driver.find_element(By.TAG_NAME, "body").text
         self.assertIn("Informe o nome", body_text)
+
+    def test_negative_value_shows_validation_error(self):
+        """Submitting a transaction with a negative value shows a validation error."""
+        self.goto("transactions:create_transaction")
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
+        ).select_by_value("DEPOSIT")
+        
+        name_input = self.driver.find_element(By.ID, "name-input")
+        name_input.clear()
+        name_input.send_keys("Teste Negativo")
+        
+        self.driver.execute_script(
+            "document.getElementById('selected-category').value = '';"
+        )
+        
+        value_input = self.driver.find_element(By.ID, "value-input")
+        value_input.clear()
+        
+        self.driver.execute_script(
+            "document.getElementById('value-input').value = '-50.00';"
+        )
+        
+        self.driver.find_element(By.ID, "sent-transaction-btn").click()
+
+        self.wait().until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'O valor deve ser maior que zero')]")
+            )
+        )
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        self.assertIn("O valor deve ser maior que zero", body_text)
+
+    def test_max_character_limit_shows_validation_error(self):
+        """Submitting a transaction name with > 150 characters shows a validation error."""
+        self.goto("transactions:create_transaction")
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
+        ).select_by_value("DEPOSIT")
+        
+        long_name = "A" * 151
+        
+        self.driver.execute_script(
+            "document.getElementById('name-input').removeAttribute('maxlength');"
+        )
+        
+        name_input = self.driver.find_element(By.ID, "name-input")
+        name_input.clear()
+        name_input.send_keys(long_name)
+        
+        self.driver.execute_script(
+            "document.getElementById('selected-category').value = '';"
+        )
+        
+        self.driver.execute_script(
+            "document.getElementById('value-input').value = '100.00';"
+        )
+        
+        self.driver.find_element(By.ID, "sent-transaction-btn").click()
+
+        self.wait().until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'O nome deve ter no máximo 150 caracteres')]")
+            )
+        )
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        self.assertIn("O nome deve ter no máximo 150 caracteres", body_text)
