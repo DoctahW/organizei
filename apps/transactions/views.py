@@ -8,6 +8,7 @@ from django.utils.dateformat import format as date_fmt
 from .models import Transaction, Category
 from django.db.models import Sum, Q
 from apps.bank_accounts.models import Conta
+from .services import validate_transaction_data
 
 def _get_categories_for_user(user):
     return Category.objects.filter(Q(user=None) | Q(user=user)).order_by('name')
@@ -46,39 +47,7 @@ def create_transactions(request):
             'category_id': request.POST.get('category_id', '').strip(),
             'conta_id': request.POST.get('conta_id', '').strip(),
         }
-        errors = {}
-
-        if not form_data['name']:
-            errors['name'] = 'Informe o nome da transação.'
-        elif len(form_data['name']) > 150:
-            errors['name'] = 'O nome deve ter no máximo 150 caracteres.'
-
-        allowed_types = {choice[0] for choice in Transaction.TYPE_CHOICES}
-        if form_data['transaction_type'] not in allowed_types:
-            errors['transaction_type'] = 'Selecione um tipo de transação válido.'
-
-        category = None
-        if form_data['category_id']:
-            try:
-                category = _get_categories_for_user(request.user).get(pk=form_data['category_id'])
-            except Category.DoesNotExist:
-                errors['category_id'] = 'Selecione uma categoria válida.'
-
-        conta = None
-        if form_data['conta_id']:
-            try:
-                conta = Conta.objects.filter(usuario=request.user).get(pk=form_data['conta_id'])
-            except Conta.DoesNotExist:
-                errors['conta_id'] = 'Selecione uma conta bancária válida.'
-
-        raw_value = form_data['value'].replace(',', '.')
-        try:
-            parsed_value = Decimal(raw_value)
-            if parsed_value <= 0:
-                errors['value'] = 'O valor deve ser maior que zero.'
-        except (InvalidOperation, ValueError):
-            parsed_value = None
-            errors['value'] = 'Informe um valor numérico válido.'
+        errors, parsed_value, category, conta = validate_transaction_data(form_data, request.user, _get_categories_for_user)
 
         if not errors:
             Transaction.objects.create(
@@ -179,39 +148,7 @@ def edit_transaction(request, pk):
             'category_id': request.POST.get('category_id', '').strip(),
             'conta_id': request.POST.get('conta_id', '').strip(),
         }
-        errors = {}
- 
-        if not form_data['name']:
-            errors['name'] = 'Informe o nome da transação.'
-        elif len(form_data['name']) > 150:
-            errors['name'] = 'O nome deve ter no máximo 150 caracteres.'
- 
-        allowed_types = {choice[0] for choice in Transaction.TYPE_CHOICES}
-        if form_data['transaction_type'] not in allowed_types:
-            errors['transaction_type'] = 'Selecione um tipo de transação válido.'
- 
-        category = None
-        if form_data['category_id']:
-            try:
-                category = _get_categories_for_user(request.user).get(pk=form_data['category_id'])
-            except Category.DoesNotExist:
-                errors['category_id'] = 'Selecione uma categoria válida.'
-
-        conta = None
-        if form_data['conta_id']:
-            try:
-                conta = Conta.objects.filter(usuario=request.user).get(pk=form_data['conta_id'])
-            except Conta.DoesNotExist:
-                errors['conta_id'] = 'Selecione uma conta bancária válida.'
- 
-        raw_value = form_data['value'].replace(',', '.')
-        try:
-            parsed_value = Decimal(raw_value)
-            if parsed_value <= 0:
-                errors['value'] = 'O valor deve ser maior que zero.'
-        except (InvalidOperation, ValueError):
-            parsed_value = None
-            errors['value'] = 'Informe um valor numérico válido.'
+        errors, parsed_value, category, conta = validate_transaction_data(form_data, request.user, _get_categories_for_user)
  
         if not errors:
             transaction.name = form_data['name']
