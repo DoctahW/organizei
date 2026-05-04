@@ -26,9 +26,13 @@ jobs:
 
       - name: Run unit tests
         run: python manage.py test --exclude-tag=e2e --verbosity=2
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - name: Check for missing migrations
         run: python manage.py makemigrations --check --dry-run
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
   test-e2e:
     runs-on: ubuntu-latest
@@ -48,9 +52,13 @@ jobs:
 
       - name: Collect static files
         run: python manage.py collectstatic --noinput
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
       - name: Run E2E tests
         run: python manage.py test tests.e2e --tag=e2e --verbosity=2
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
   deploy:
     runs-on: ubuntu-latest

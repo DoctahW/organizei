@@ -96,6 +96,14 @@
     flex-wrap: wrap;
     color: var(--text-muted);
     font-size: 13px;
+    align-items: center;
+}
+
+.acc__balance {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-primary);
 }
 
 .acc__empty {

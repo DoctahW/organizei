@@ -36,12 +36,17 @@
               <span class="account-number">Conta {{ conta.number }}</span>
             </div>
           </div>
-          <form method="POST" action="{% url 'delete_account' conta.id %}" class="account-delete-form">
-            {% csrf_token %}
-            <button type="submit" class="account-delete-btn" title="Excluir conta" aria-label="Excluir conta">
-              Excluir
-            </button>
-          </form>
+          <div class="account-actions">
+            <span class="account-balance">
+              R$ {{ conta.balance|floatformat:2 }}
+            </span>
+            <form method="POST" action="{% url 'delete_account' conta.id %}" class="account-delete-form">
+              {% csrf_token %}
+              <button type="submit" class="account-delete-btn" title="Excluir conta" aria-label="Excluir conta">
+                Excluir
+              </button>
+            </form>
+          </div>
         </div>
       {% empty %}
         <p class="tx-empty">Você ainda não cadastrou nenhuma conta.</p>

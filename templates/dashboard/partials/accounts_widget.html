@@ -42,6 +42,9 @@
           <span>Ag. {{ conta.agency }}</span>
           {% endif %}
           <span>Conta {{ conta.number }}</span>
+          <span class="acc__balance">
+            R$ {{ conta.balance|floatformat:2 }}
+          </span>
         </div>
       </div>
     </article>

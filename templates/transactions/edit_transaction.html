@@ -57,6 +57,17 @@
             </p>
         </section>
 
+        <!-- selecionar conta bancária -->
+        <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
+            <option value="">Selecione a conta bancária (Opcional)</option>
+            {% for conta in contas %}
+            <option value="{{ conta.id }}" {% if form_data.conta_id == conta.id|stringformat:"s" %}selected{% endif %}>
+                {{ conta.nickname|default:conta.bank.name }} - {{ conta.number }}
+            </option>
+            {% endfor %}
+        </select>
+        {% if errors.conta_id %}<p style="color: red; margin-top: -10px; margin-bottom: 10px;">{{ errors.conta_id }}</p>{% endif %}
+
         <label for="selected-category">Categoria</label>
         <input type="hidden" name="category_id" id="selected-category"
             value="{{ form_data.category_id|default:'' }}">

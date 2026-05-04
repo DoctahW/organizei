@@ -1,16 +1,19 @@
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Value
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
-
 from .models import Goal, GoalContribution
+from .services import validate_goal_data, validate_contribution_data
 
 
 @login_required
 def goal_list(request):
-    goals = Goal.objects.filter(user=request.user).prefetch_related("contributions")
+    goals = Goal.objects.filter(user=request.user).annotate(
+        current_amount=Coalesce(Sum("contributions__amount"), Value(Decimal("0.00")))
+    )
 
     total_target = goals.aggregate(total=Sum("target_amount"))["total"] or 0
     total_saved = sum(g.current_amount for g in goals)
@@ -35,19 +38,7 @@ def goal_create(request):
             "deadline": request.POST.get("deadline", "").strip(),
         }
 
-        if not data["name"]:
-            errors["name"] = "Nome da meta é obrigatório."
-
-        amount = None
-        try:
-            amount = Decimal(data["target_amount"])
-            if amount <= 0:
-                errors["target_amount"] = "O valor deve ser maior que zero."
-        except (InvalidOperation, ValueError):
-            errors["target_amount"] = "Informe um valor válido."
-
-        if not data["deadline"]:
-            errors["deadline"] = "Data limite é obrigatória."
+        errors, amount = validate_goal_data(data)
 
         if not errors:
             goal = Goal.objects.create(
@@ -81,16 +72,7 @@ def goal_contribute(request, pk):
             "date": request.POST.get("date", "").strip(),
         }
 
-        amount = None
-        try:
-            amount = Decimal(data["amount"])
-            if amount <= 0:
-                errors["amount"] = "O valor deve ser maior que zero."
-        except (InvalidOperation, ValueError):
-            errors["amount"] = "Informe um valor válido."
-
-        if not data["date"]:
-            errors["date"] = "Data é obrigatória."
+        errors, amount = validate_contribution_data(data)
 
         if not errors:
             contribution = GoalContribution.objects.create(
