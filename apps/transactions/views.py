@@ -1,4 +1,3 @@
-from decimal import Decimal, InvalidOperation
 from datetime import date, timedelta
 from itertools import groupby
 

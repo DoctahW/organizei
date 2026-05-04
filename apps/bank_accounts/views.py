@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Conta, Bank
+from .services import validate_bank_account_data
 
 
 from django.db.models import Sum, Q
@@ -36,8 +37,6 @@ def register_account(request):
 @login_required
 def register_auto(request):
     return render(request, 'bank_accounts/register_auto.html')
-
-from .services import validate_bank_account_data
 
 @login_required
 def register_manual(request):

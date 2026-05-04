@@ -4,7 +4,6 @@ from .models import Budget
 from django.db.models import Sum
 from datetime import date
 from apps.transactions.models import Transaction
-from decimal import Decimal
 
 from .services import validate_budget_data
 
