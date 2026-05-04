@@ -29,6 +29,10 @@ class Goal(models.Model):
         total = self.contributions.aggregate(total=Sum("amount"))["total"]
         return total or Decimal("0.00")
 
+    @current_amount.setter
+    def current_amount(self, value):
+        self.__dict__["current_amount"] = value
+
     @property
     def progress_percent(self):
         if self.target_amount == 0:
