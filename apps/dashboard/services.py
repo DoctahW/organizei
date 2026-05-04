@@ -3,7 +3,7 @@ from calendar import monthrange
 from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Value
 from django.db.models.functions import Coalesce
 from django.utils.dateformat import format as date_fmt
 from django.utils.timezone import localdate
@@ -326,13 +326,13 @@ def build_dashboard_context(user) -> dict:
     #seção de objetivos na dashboard
     all_incomplete = list(
         user.goals.filter(is_completed=False)
-        .prefetch_related("contributions")
+        .annotate(current_amount=Coalesce(Sum("contributions__amount"), Value(Decimal("0.00"))))
         .order_by("deadline")
     )
 
     # logica pra reduzir numero de queries
     for goal in all_incomplete:
-        goal.cached_amount = sum(c.amount for c in goal.contributions.all())
+        goal.cached_amount = goal.current_amount
         goal.cached_progress = (
             min(float(goal.cached_amount / goal.target_amount * 100), 100.0)
             if goal.target_amount

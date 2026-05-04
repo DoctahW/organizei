@@ -2,7 +2,8 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Value
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Goal, GoalContribution
 from .services import validate_goal_data, validate_contribution_data
@@ -10,7 +11,9 @@ from .services import validate_goal_data, validate_contribution_data
 
 @login_required
 def goal_list(request):
-    goals = Goal.objects.filter(user=request.user).prefetch_related("contributions")
+    goals = Goal.objects.filter(user=request.user).annotate(
+        current_amount=Coalesce(Sum("contributions__amount"), Value(Decimal("0.00")))
+    )
 
     total_target = goals.aggregate(total=Sum("target_amount"))["total"] or 0
     total_saved = sum(g.current_amount for g in goals)

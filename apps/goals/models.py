@@ -21,6 +21,11 @@ class Goal(models.Model):
 
     @property
     def current_amount(self):
+        if "current_amount" in self.__dict__:
+            return self.__dict__["current_amount"]
+        if hasattr(self, "_prefetched_objects_cache") and "contributions" in self._prefetched_objects_cache:
+            return sum((c.amount for c in self.contributions.all()), Decimal("0.00"))
+        # Fallback to single-object access
         total = self.contributions.aggregate(total=Sum("amount"))["total"]
         return total or Decimal("0.00")
 
