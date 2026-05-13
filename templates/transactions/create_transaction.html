@@ -85,6 +85,23 @@
             </a>
         </section>
 
+        
+
+        <!-- selecionar data da transação -->
+        <section class="choose-date-container">
+            <label for="date-input">Data da Transação</label>
+            <input type="date" id="date-input" name="date" value="today-date" required class="input-box">
+
+            <div class="recurring-container">
+                <label for="recurring-btn">Lançamento</label>
+                <div class="recurring-btns">
+                    <button type="button" onclick="setRecurring(false)" class="" id="single-btn">Único</button>
+                    <button type="button" onclick="setRecurring(true)" class="" id="recurring-btn">Recorrente</button>
+                </div>
+            </div>
+        </section>
+
+
         <button type="submit" class="button-glass" id="sent-transaction-btn">Criar Transação</button>
     </form>
 </section>

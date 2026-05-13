@@ -105,3 +105,37 @@ function openCreateCategory() {
     }
     //add o restante
 }
+
+function setRecurring(isRecurring) {
+    const singleBtn = document.getElementById('single-btn');
+    const recurringBtn = document.getElementById('recurring-btn');
+    if (isRecurring == true) {
+        recurringBtn.style.backgroundColor = 'rgba(92, 208, 137, 0.09)';
+        recurringBtn.style.border = '1px solid #5cd089';
+        singleBtn.style.backgroundColor = 'transparent';
+        singleBtn.style.borderTop = '1px solid var(--glass-border-top)';
+        singleBtn.style.borderBottom = '1px solid var(--glass-border-bottom)';
+        singleBtn.style.borderLeft = 'none';
+        singleBtn.style.borderRight = 'none';
+        console.log("isRecurring:", isRecurring);
+    }else{
+        singleBtn.style.backgroundColor = 'rgba(92, 208, 137, 0.09)';
+        singleBtn.style.border = '1px solid #5cd089';
+        recurringBtn.style.backgroundColor = 'transparent';
+        recurringBtn.style.borderTop = '1px solid var(--glass-border-top)';
+        recurringBtn.style.borderBottom = '1px solid var(--glass-border-bottom)';
+        recurringBtn.style.borderLeft = 'none';
+        recurringBtn.style.borderRight = 'none';
+        console.log("isRecurring:", isRecurring);
+    }
+}
+
+window.setRecurring = setRecurring;
+
+const recurringSingleBtn = document.getElementById('single-btn');
+const recurringRecurringBtn = document.getElementById('recurring-btn');
+
+if (recurringSingleBtn && recurringRecurringBtn) {
+    recurringSingleBtn.addEventListener('click', () => setRecurring(false));
+    recurringRecurringBtn.addEventListener('click', () => setRecurring(true));
+}
