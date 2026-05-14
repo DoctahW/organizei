@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -52,7 +53,7 @@ class Transaction(models.Model):
         blank=True,
         verbose_name="Conta Bancária",
     )
-    date = models.DateField(auto_now_add=True, verbose_name="Data")
+    date = models.DateField(default=timezone.now, verbose_name="Data")
 
     def __str__(self):
         return f"{self.name} - R$ {self.value} ({self.get_transaction_type_display()})"

@@ -45,10 +45,14 @@ def create_transactions(request):
             'value': request.POST.get('value', '').strip(),
             'category_id': request.POST.get('category_id', '').strip(),
             'conta_id': request.POST.get('conta_id', '').strip(),
+            'date': request.POST.get('date', '').strip(),  # <-- ADICIONE ESTA LINHA
         }
         errors, parsed_value, category, conta = validate_transaction_data(form_data, request.user, _get_categories_for_user)
 
         if not errors:
+            extra_kwargs = {}
+            if form_data['date']:
+                extra_kwargs['date'] = form_data['date']
             Transaction.objects.create(
                 user=request.user,
                 name=form_data['name'],
@@ -56,6 +60,7 @@ def create_transactions(request):
                 value=parsed_value,
                 category=category,
                 conta=conta,
+                **extra_kwargs 
             )
             return redirect('transactions:list')
 
@@ -146,6 +151,7 @@ def edit_transaction(request, pk):
             'value': request.POST.get('value', '').strip(),
             'category_id': request.POST.get('category_id', '').strip(),
             'conta_id': request.POST.get('conta_id', '').strip(),
+            'date': request.POST.get('date', '').strip(),
         }
         errors, parsed_value, category, conta = validate_transaction_data(form_data, request.user, _get_categories_for_user)
  
@@ -155,6 +161,8 @@ def edit_transaction(request, pk):
             transaction.value = parsed_value
             transaction.category = category
             transaction.conta = conta
+            if form_data['date']:
+                transaction.date = form_data['date']
             transaction.save()
             return redirect('transactions:list')
  
@@ -167,6 +175,7 @@ def edit_transaction(request, pk):
         'value': str(transaction.value).replace('.', ','),
         'category_id': str(transaction.category.pk) if transaction.category else '',
         'conta_id': str(transaction.conta.pk) if transaction.conta else '',
+        'date': transaction.date.strftime('%Y-%m-%d') if transaction.date else '',
     }
     context = _build_edit_transaction_context(request.user, transaction, form_data=form_data)
     return render(request, 'transactions/edit_transaction.html', context)

@@ -57,6 +57,14 @@
             </p>
         </section>
 
+        <section class="date_container" style="margin-bottom: 15px;">
+            <label for="date-input">Data da Transação</label>
+            <input type="date" name="date" id="date-input" 
+                value="{{ form_data.date|default:'' }}" 
+                required class="input-box">
+            {% if errors.date %}<p style="color: red;">{{ errors.date }}</p>{% endif %}
+        </section>
+
         <!-- selecionar conta bancária -->
         <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
             <option value="">Selecione a conta bancária (Opcional)</option>
