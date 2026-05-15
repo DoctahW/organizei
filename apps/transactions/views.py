@@ -105,7 +105,8 @@ def get_transactions(request):
     # Transações por mês
     monthly_qs = Transaction.objects.filter(
         user=request.user, date__year=year, date__month=month
-    ).order_by('-date', '-pk')
+    ).select_related('category').order_by('-date', '-id')
+    #.order_by('-date', '-pk')
 
     monthly_totals = monthly_qs.aggregate(
         e=Sum('value', filter=Q(transaction_type='DEPOSIT')),
