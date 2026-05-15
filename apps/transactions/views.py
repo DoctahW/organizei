@@ -32,8 +32,12 @@ def _build_create_transaction_context(user, form_data=None, errors=None):
 
 # exibir o formulário para criar uma nova transação
 @login_required
-# to do: criar uma funcao de adicionar uma nova categoria
 def create_category(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            Category.objects.create(name=name, user=request.user)
+            return redirect('transactions:create_transaction')
     return render(request, 'transactions/create_category.html')
 
 @login_required
@@ -45,7 +49,7 @@ def create_transactions(request):
             'value': request.POST.get('value', '').strip(),
             'category_id': request.POST.get('category_id', '').strip(),
             'conta_id': request.POST.get('conta_id', '').strip(),
-            'date': request.POST.get('date', '').strip(),  # <-- ADICIONE ESTA LINHA
+            'date': request.POST.get('date', '').strip(),  
         }
         errors, parsed_value, category, conta = validate_transaction_data(form_data, request.user, _get_categories_for_user)
 
