@@ -1,63 +1,71 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<main class="main-content" style="padding-top: 40px; min-height: 100vh; background: #121212;">
-    <div class="glass" style="padding: 30px; border-radius: 25px; max-width: 500px; margin: 0 auto; color: white; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
-        
-        <header style="margin-bottom: 30px;">
-            <h2 style="color: #ffca28; margin-bottom: 5px; font-size: 1.8rem;">Assinaturas</h2>
-            <p style="opacity: 0.6; font-size: 0.9rem;">Gerencie seus gastos fixos mensais</p>
-        </header>
-
-        <form method="post" action="{% url 'subscriptions:manage_subscriptions' %}" style="display: flex; flex-direction: column; gap: 15px;">
-            {% csrf_token %}
-            
-            <div class="input-group">
-                <input type="text" name="name" placeholder="Ex: Netflix, Aluguel, Internet" required 
-                       style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white;">
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <input type="number" name="day" placeholder="Dia" min="1" max="31" required 
-                       style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white;">
-                
-                <input type="text" name="value" placeholder="Valor (Ex: 55,90)" required 
-                       style="flex: 2; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white;">
-            </div>
-
-            <button type="submit" class="button-glass" 
-                    style="background: #ffca28; color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s;">
-                + Adicionar Assinatura
-            </button>
-        </form>
-
-        <hr style="margin: 30px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
-
-        <div class="list" style="display: flex; flex-direction: column; gap: 12px;">
-            {% for sub in subscriptions %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);">
-                <div>
-                    <span style="display: block; font-weight: bold; font-size: 1.1rem;">{{ sub.name }}</span>
-                    <small style="opacity: 0.5;">Todo dia {{ sub.day_of_month }}</small>
-                </div>
-                
-                <div style="text-align: right;">
-                    <span style="display: block; color: #ff5252; font-weight: bold; margin-bottom: 5px;">R$ {{ sub.value }}</span>
-                    
-                    <form action="{% url 'subscriptions:delete_subscription' sub.pk %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" style="background: none; border: none; color: #ff5252; font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 0; opacity: 0.8;">
-                            Remover
-                        </button>
-                    </form>
-                </div>
-            </div>
-            {% empty %}
-            <div style="text-align: center; padding: 20px; opacity: 0.4;">
-                <p>Nenhuma assinatura cadastrada.</p>
-            </div>
-            {% endfor %}
+<main class="main-content" style="background: #0d0d0d; min-height: 100vh; padding: 20px; color: white;">
+    
+    <div style="background: #111; border-radius: 30px; padding: 40px; display: flex; justify-content: space-around; align-items: center; margin-bottom: 40px; border: 1px solid #222;">
+        <div style="text-align: center;">
+            <p style="color: #aaa; margin-bottom: 10px; font-size: 1.1rem; font-weight: bold;">A pagar</p>
+            <h2 style="color: #00c853; font-size: 2.2rem; margin: 0;">R$ {{ total_a_pagar|default:"0,00" }}</h2>
+        </div>
+        <div style="text-align: center;">
+            <p style="color: #aaa; margin-bottom: 10px; font-size: 1.1rem; font-weight: bold;">Pago</p>
+            <h2 style="color: #d32f2f; font-size: 2.2rem; margin: 0; opacity: 0.8;">R$ {{ total_pago|default:"0,00" }}</h2>
+        </div>
+        <div style="text-align: center;">
+            <p style="color: #aaa; margin-bottom: 10px; font-size: 1.1rem; font-weight: bold;">Total das assinaturas</p>
+            <h2 style="color: #ffca28; font-size: 2.2rem; margin: 0;">R$ {{ total_geral|default:"0,00" }}</h2>
         </div>
     </div>
+
+    <h3 style="color: #aaa; margin-bottom: 20px; font-weight: normal; font-size: 0.9rem;">
+        Hoje, {{ hoje|date:"d \d\e F"|default:"15 de Maio" }}
+    </h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for sub in subscriptions %}
+        <div style="background: #0a0a0a; border-radius: 50px; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #161616;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="background: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: #ff5252; transform: rotate(45deg); font-weight: bold; font-size: 1.2rem;">↑</span>
+                </div>
+                <div>
+                    <p style="margin: 0; font-weight: bold; font-size: 0.95rem;">{{ sub.name }}</p>
+                    <p style="margin: 0; font-size: 0.75rem; color: #555;">Assinatura • Mensal</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span style="color: #ff5252; font-weight: bold; font-size: 1rem;">- R$ {{ sub.value }}</span>
+                <form action="{% url 'subscriptions:delete_subscription' sub.pk %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: #333; cursor: pointer; font-size: 1rem;">×</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 40px; text-align: center;">
+        <button onclick="document.getElementById('modal-add').style.display='flex'" 
+                style="background: #111; border: 1px dashed #333; color: #666; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 0.9rem;">
+            + Adicionar nova conta fixa
+        </button>
+    </div>
+
+    <div id="modal-add" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; justify-content:center; align-items:center;">
+        <div style="background:#111; padding:30px; border-radius:20px; border:1px solid #333; width:90%; max-width:400px;">
+            <h3 style="color:#ffca28; margin-top:0;">Nova Assinatura</h3>
+            <form method="post" action="{% url 'subscriptions:manage_subscriptions' %}" style="display:flex; flex-direction:column; gap:15px;">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="Nome" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
+                <input type="number" name="day" placeholder="Dia do vencimento" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
+                <input type="text" name="value" placeholder="Valor (Ex: 55,90)" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
+                <button type="submit" style="background:#ffca28; color:black; padding:10px; border:none; border-radius:8px; font-weight:bold;">Salvar</button>
+                <button type="button" onclick="document.getElementById('modal-add').style.display='none'" style="background:none; color:#666; border:none;">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
 </main>
 {% endblock %}
