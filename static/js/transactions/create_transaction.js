@@ -109,26 +109,44 @@ function openCreateCategory() {
 function setRecurring(isRecurring) {
     const singleBtn = document.getElementById('single-btn');
     const recurringBtn = document.getElementById('recurring-btn');
-    if (isRecurring == true) {
+    const hiddenInput = document.getElementById('is_fixed_input');
+
+    if (!hiddenInput || !singleBtn || !recurringBtn) return; // Segurança básica
+
+    if (isRecurring) {
+        // Estilo Recorrente
         recurringBtn.style.backgroundColor = 'rgba(92, 208, 137, 0.09)';
         recurringBtn.style.border = '1px solid #5cd089';
+        
+        // Reseta Único
         singleBtn.style.backgroundColor = 'transparent';
+        singleBtn.style.border = '1px solid transparent'; // Simplifiquei aqui
         singleBtn.style.borderTop = '1px solid var(--glass-border-top)';
         singleBtn.style.borderBottom = '1px solid var(--glass-border-bottom)';
-        singleBtn.style.borderLeft = 'none';
-        singleBtn.style.borderRight = 'none';
-        console.log("isRecurring:", isRecurring);
-    }else{
+
+        hiddenInput.value = 'on'; 
+    } else {
+        // Estilo Único
         singleBtn.style.backgroundColor = 'rgba(92, 208, 137, 0.09)';
         singleBtn.style.border = '1px solid #5cd089';
+        
+        // Reseta Recorrente
         recurringBtn.style.backgroundColor = 'transparent';
+        recurringBtn.style.border = '1px solid transparent';
         recurringBtn.style.borderTop = '1px solid var(--glass-border-top)';
         recurringBtn.style.borderBottom = '1px solid var(--glass-border-bottom)';
-        recurringBtn.style.borderLeft = 'none';
-        recurringBtn.style.borderRight = 'none';
-        console.log("isRecurring:", isRecurring);
+
+        hiddenInput.value = 'off';
     }
 }
+
+// Vincula os botões à função assim que a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    const sBtn = document.getElementById('single-btn');
+    const rBtn = document.getElementById('recurring-btn');
+    if(sBtn) sBtn.onclick = () => setRecurring(false);
+    if(rBtn) rBtn.onclick = () => setRecurring(true);
+});
 
 window.setRecurring = setRecurring;
 

@@ -1,4 +1,5 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+from dateutil.relativedelta import relativedelta
 from itertools import groupby
 
 from django.shortcuts import redirect, render, get_object_or_404
@@ -30,7 +31,6 @@ def _build_create_transaction_context(user, form_data=None, errors=None):
     }
 
 
-# exibir o formulário para criar uma nova transação
 @login_required
 def create_category(request):
     if request.method == 'POST':
@@ -51,7 +51,12 @@ def create_transactions(request):
             'conta_id': request.POST.get('conta_id', '').strip(),
             'date': request.POST.get('date', '').strip(),  
         }
-        errors, parsed_value, category, conta = validate_transaction_data(form_data, request.user, _get_categories_for_user)
+        
+        is_fixed_input = request.POST.get('is_fixed') == 'on'
+
+        errors, parsed_value, category, conta = validate_transaction_data(
+            form_data, request.user, _get_categories_for_user
+        )
 
         if not errors:
             extra_kwargs = {}
@@ -64,8 +69,25 @@ def create_transactions(request):
                 value=parsed_value,
                 category=category,
                 conta=conta,
+                is_fixed=is_fixed_input,
                 **extra_kwargs 
             )
+
+            if is_fixed_input:
+                start_date = datetime.strptime(form_data['date'], '%Y-%m-%d').date() if form_data['date'] else date.today()
+                
+                for i in range(1, 12):
+                    Transaction.objects.create(
+                        user=request.user,
+                        name=form_data['name'],
+                        transaction_type=form_data['transaction_type'],
+                        value=parsed_value,
+                        category=category,
+                        conta=conta,
+                        date=start_date + relativedelta(months=i),
+                        is_fixed=True
+                    )
+
             return redirect('transactions:list')
 
         context = _build_create_transaction_context(request.user, form_data=form_data, errors=errors)
@@ -73,7 +95,6 @@ def create_transactions(request):
 
     context = _build_create_transaction_context(request.user)
     return render(request, 'transactions/create_transaction.html', context)
-
 
 # verificar e enviar os dados do form da transação para o banco de dados (ainda não implementado)
 def post_transaction(request):

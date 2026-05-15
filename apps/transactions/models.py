@@ -54,6 +54,7 @@ class Transaction(models.Model):
         verbose_name="Conta Bancária",
     )
     date = models.DateField(default=timezone.now, verbose_name="Data")
+    is_fixed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} - R$ {self.value} ({self.get_transaction_type_display()})"

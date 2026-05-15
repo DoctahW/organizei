@@ -7,13 +7,11 @@
 {% endblock %}
 
 {% block content %}
-
-<section class="new_transaction ">
+<section class="new_transaction">
     <header>
         <span class="back_button" id="back_button">
             <a class="back_button-link" id="back_button-link" href="{% url 'transactions:list' %}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6" />
                 </svg>
             </a>
@@ -23,84 +21,65 @@
 
     <form method="post" action="{% url 'transactions:create_transaction' %}" class="form-transaction-container glass">
         {% csrf_token %}
-        <!-- selecionar tipo de transação -->
+        
         <select name="transaction_type" required class="transaction_type_select">
             <option value="">Selecione o tipo de transação</option>
             {% for value, label in transaction_type_choices %}
-            <option value="{{ value }}" {% if form_data.transaction_type == value %}selected{% endif %}>{{ label }}
-            </option>
+            <option value="{{ value }}" {% if form_data.transaction_type == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
-        {% if errors.transaction_type %}<p>{{ errors.transaction_type }}</p>{% endif %}
 
-        <!-- nome da transação -->
-         <section class="name_container name_input">
-             <label for="name-input" class="name_label">Nome da Transação</label>
-             <input type="text" name="name" placeholder="Ex.: Conta de energia, Almoço" value="{{ form_data.name|default:'' }}" required  class="input-box" id="name-input">
-             {% if errors.name %}<p>{{ errors.name }}</p>{% endif %}
-         </section>
-
-
-        <!-- valor da transação -->
-        <section class="value_container">
-            <label for="value-input">Valor da Transação (R$)</label>
-            <input type="text" inputmode="decimal" id="value-input" name="value" placeholder="0,00"
-                value="{{ form_data.value|default:'' }}" required class="input-box">
-            {% if errors.value %}<p>{{ errors.value }}</p>{% endif %}
-            <p>Valor na conta: R$ {% if account_balance %}{{ account_balance|floatformat:2 }}{% else %}0.00{% endif %}
-            </p>
+        <section class="name_container name_input">
+            <label for="name-input" class="name_label">Nome da Transação</label>
+            <input type="text" name="name" placeholder="Ex.: Conta de energia" value="{{ form_data.name|default:'' }}" required class="input-box" id="name-input">
         </section>
 
-        <!-- selecionar conta bancária -->
+        <section class="value_container">
+            <label for="value-input">Valor da Transação (R$)</label>
+            <input type="text" inputmode="decimal" id="value-input" name="value" placeholder="0,00" value="{{ form_data.value|default:'' }}" required class="input-box">
+        </section>
+
         <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
-            <option value="">Selecione a conta bancária (Opcional)</option>
+            <option value="">Selecione a conta bancária</option>
             {% for conta in contas %}
             <option value="{{ conta.id }}" {% if form_data.conta_id == conta.id|stringformat:"s" %}selected{% endif %}>
-                {{ conta.nickname|default:conta.bank.name }} - {{ conta.number }}
+                {{ conta.nickname|default:conta.bank.name }}
             </option>
             {% endfor %}
         </select>
-        {% if errors.conta_id %}<p style="color: red; margin-top: -10px; margin-bottom: 10px;">{{ errors.conta_id }}</p>{% endif %}
 
         <label for="selected-category">Categoria</label>
-        <!-- selecionar categoria -->
-        <input type="hidden" name="category_id" id="selected-category" value="{{ form_data.category_id|default:8 }}"class="input-box">
-        
+        <input type="hidden" name="category_id" id="selected-category" value="{{ form_data.category_id|default:8 }}">
         <section class="category_btn_container input-box" onclick="openCategoryModal()">
             <button class="category-option" type="button" id="category-btn">
                 <p>Selecionar categoria</p><span>></span>
             </button>
         </section>
-        
-        <!-- modal selecionar categoria -->
+
         <section class="category_modal_container" id="category-modal" style="display: none;">
             {% for category in categories %}
             <div class="category-option modal-option input-box" onclick="selectCategory('{{ category.id }}', '{{ category.name }}')">
-                <!-- <span>{{ category.icon }}</span> -->
                 <p>{{ category.name }}</p>
-             </div>
-             {%endfor %}
-            <a id="new-category-btn" class="button-glass" href='{% url 'transactions:create_category' %}'>
-                <p>Adicionar Nova Categoria</p>
-            </a>
+            </div>
+            {% endfor %}
         </section>
 
-        
-
-        <!-- selecionar data da transação -->
         <section class="choose-date-container">
             <label for="date-input">Data da Transação</label>
             <input type="date" name="date" id="date-input" required class="input-box">
 
-            <div class="recurring-container">
-                <label for="recurring-btn">Lançamento</label>
-                <div class="recurring-btns">
-                    <button type="button" onclick="setRecurring(false)" class="" id="single-btn">Único</button>
-                    <button type="button" onclick="setRecurring(true)" class="" id="recurring-btn">Recorrente (mensal)</button>
+            <div class="recurring-container" style="margin-top: 20px;">
+                <label>Tipo de Lançamento:</label>
+                <div style="display: flex; gap: 20px; margin-top: 10px; color: white;">
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="is_fixed" value="off" checked> Único
+                    </label>
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="is_fixed" value="on"> Recorrente (12 meses)
+                    </label>
                 </div>
             </div>
         </section>
-
 
         <button type="submit" class="button-glass" id="sent-transaction-btn">Criar Transação</button>
     </form>
