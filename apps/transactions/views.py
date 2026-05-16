@@ -12,7 +12,6 @@ from .services import validate_transaction_data
 
 
 def _get_categories_for_user(user):
-    """Retorna categorias disponíveis, excluindo a reservada 'Assinatura'."""
     return Category.objects.filter(
         Q(user=None) | Q(user=user)
     ).exclude(
@@ -41,7 +40,6 @@ def _build_create_transaction_context(user, form_data=None, errors=None):
 def create_category(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
-        # Impede criação manual de uma categoria com nome reservado
         if name and name.lower() != Category.SUBSCRIPTION_CATEGORY_NAME.lower():
             Category.objects.create(name=name, user=request.user)
         return redirect('transactions:create_transaction')
@@ -236,6 +234,8 @@ def _build_edit_transaction_context(user, transaction, form_data=None, errors=No
 @login_required
 def delete_transaction(request, pk):
     transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+    if transaction.subscription_id is not None:
+        return redirect('transactions:update', pk=pk)
 
     if request.method == 'POST':
         transaction.delete()

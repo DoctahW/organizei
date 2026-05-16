@@ -111,6 +111,7 @@
             <button type="submit" class="button-glass" id="sent-transaction-btn">
                 Salvar Alterações
             </button>
+            {% if not is_subscription_transaction %}
             <a href="{% url 'transactions:delete' transaction.pk %}" class="button-glass" id="delete-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
@@ -121,6 +122,11 @@
                 </svg>
                 Excluir
             </a>
+            {% else %}
+            <p style="color: #555; font-size: 0.8rem; text-align: center; margin-top: 10px;">
+                Gerada por assinatura — para remover, exclua a assinatura.
+            </p>
+            {% endif %}
         </div>
     </form>
 </section>
