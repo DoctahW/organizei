@@ -78,14 +78,11 @@ def subscription_detail(request, pk):
     today = date.today()
     
     occurrences = []
-    # Começa estritamente no início do contrato para não sumir com o passado
+    # Sempre começa na start_date e gera exatamente 12 parcelas
     base_date = subscription.start_date
+    TOTAL_MESES = 12
 
-    # Calcula a janela dinâmica para exibir o passado inteiro + 12 meses futuros
-    meses_passados = (today.year - base_date.year) * 12 + (today.month - base_date.month)
-    total_meses_janela = max(12, meses_passados + 12)
-
-    for i in range(total_meses_janela):
+    for i in range(TOTAL_MESES):
         target_month_date = base_date + relativedelta(months=i)
         
         try:
