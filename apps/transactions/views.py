@@ -20,7 +20,7 @@ def _get_categories_for_user(user):
 
 
 def _build_create_transaction_context(user, form_data=None, errors=None):
-    totais = Transaction.objects.filter(user=user).aggregate(
+    totais = Transaction.objects.filter(user=user, date__lte=date.today()).aggregate(
         e=Sum('value', filter=Q(transaction_type='DEPOSIT')),
         s=Sum('value', filter=Q(transaction_type='WITHDRAWAL'))
     )
@@ -120,7 +120,7 @@ def get_transactions(request):
     elif month > 12:
         month, year = 1, year + 1
 
-    totais = Transaction.objects.filter(user=request.user).aggregate(
+    totais = Transaction.objects.filter(user=request.user, date__lte=today).aggregate(
         e=Sum('value', filter=Q(transaction_type='DEPOSIT')),
         s=Sum('value', filter=Q(transaction_type='WITHDRAWAL'))
     )
@@ -210,7 +210,7 @@ def edit_transaction(request, pk):
 
 
 def _build_edit_transaction_context(user, transaction, form_data=None, errors=None):
-    totais = Transaction.objects.filter(user=user).aggregate(
+    totais = Transaction.objects.filter(user=user, date__lte=date.today()).aggregate(
         e=Sum('value', filter=Q(transaction_type='DEPOSIT')),
         s=Sum('value', filter=Q(transaction_type='WITHDRAWAL'))
     )
@@ -234,6 +234,7 @@ def _build_edit_transaction_context(user, transaction, form_data=None, errors=No
 @login_required
 def delete_transaction(request, pk):
     transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+
     if transaction.subscription_id is not None:
         return redirect('transactions:update', pk=pk)
 
