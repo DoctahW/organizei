@@ -10,17 +10,24 @@ def manage_subscriptions(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         value = request.POST.get('value').replace('R$', '').replace('.', '').replace(',', '.').strip()
-        day = request.POST.get('day')
-        Subscription.objects.create(user=request.user, name=name, value=value, day_of_month=day)
+        
+        start_date_input = request.POST.get('start_date') 
+        
+        Subscription.objects.create(
+            user=request.user, 
+            name=name, 
+            value=value, 
+            start_date=start_date_input
+        )
         return redirect('subscriptions:manage_subscriptions')
 
     subs = Subscription.objects.filter(user=request.user)
     today = date.today()
 
     total_geral = subs.aggregate(Sum('value'))['value__sum'] or 0
-    total_pago = subs.filter(day_of_month__lte=today.day).aggregate(Sum('value'))['value__sum'] or 0
     
-    total_a_pagar = subs.filter(day_of_month__gt=today.day).aggregate(Sum('value'))['value__sum'] or 0
+    total_pago = subs.filter(start_date__day__lte=today.day).aggregate(Sum('value'))['value__sum'] or 0
+    total_a_pagar = subs.filter(start_date__day__gt=today.day).aggregate(Sum('value'))['value__sum'] or 0
 
     context = {
         'subscriptions': subs,

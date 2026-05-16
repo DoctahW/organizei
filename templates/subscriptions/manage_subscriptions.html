@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <p style="margin: 0; font-weight: bold; font-size: 0.95rem;">{{ sub.name }}</p>
-                    <p style="margin: 0; font-size: 0.75rem; color: #555;">Assinatura • Mensal</p>
+                    <p style="margin: 0; font-size: 0.75rem; color: #555;">Assinatura • Todo dia {{ sub.start_date|date:"d" }}</p>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 20px;">
@@ -59,7 +59,9 @@
             <form method="post" action="{% url 'subscriptions:manage_subscriptions' %}" style="display:flex; flex-direction:column; gap:15px;">
                 {% csrf_token %}
                 <input type="text" name="name" placeholder="Nome" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
-                <input type="number" name="day" placeholder="Dia do vencimento" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
+                
+                <input type="date" name="start_date" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
+                
                 <input type="text" name="value" placeholder="Valor (Ex: 55,90)" required style="padding:10px; border-radius:8px; border:1px solid #333; background:#000; color:white;">
                 <button type="submit" style="background:#ffca28; color:black; padding:10px; border:none; border-radius:8px; font-weight:bold;">Salvar</button>
                 <button type="button" onclick="document.getElementById('modal-add').style.display='none'" style="background:none; color:#666; border:none;">Cancelar</button>

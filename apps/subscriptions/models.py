@@ -1,11 +1,11 @@
-from django.db import models  # <--- ESSA LINHA AQUI
+from django.db import models  
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     value = models.DecimalField(max_digits=10, decimal_places=2)
-    day_of_month = models.PositiveIntegerField()
-
+    start_date = models.DateField(default=timezone.now, verbose_name="Data de Início/Vencimento")
     def __str__(self):
-        return f"{self.name} - Dia {self.day_of_month}"
+        return f"{self.name} - Dia {self.start_date.day}"
