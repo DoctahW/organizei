@@ -169,13 +169,17 @@ def get_transactions(request):
 @login_required
 def edit_transaction(request, pk):
     transaction = get_object_or_404(Transaction, pk=pk, user=request.user)
+    is_subscription = transaction.subscription_id is not None
 
     if request.method == 'POST':
         form_data = {
             'name': request.POST.get('name', '').strip(),
             'transaction_type': request.POST.get('transaction_type', '').strip(),
             'value': request.POST.get('value', '').strip(),
-            'category_id': request.POST.get('category_id', '').strip(),
+            'category_id': (
+                str(transaction.category.pk) if is_subscription and transaction.category
+                else request.POST.get('category_id', '').strip()
+            ),
             'conta_id': request.POST.get('conta_id', '').strip(),
             'date': request.POST.get('date', '').strip(),
         }
@@ -183,15 +187,33 @@ def edit_transaction(request, pk):
             form_data, request.user, _get_categories_for_user
         )
 
+        if is_subscription:
+            errors.pop('category_id', None)
+            category = transaction.category
+
         if not errors:
-            transaction.name = form_data['name']
-            transaction.transaction_type = form_data['transaction_type']
-            transaction.value = parsed_value
-            transaction.category = category
-            transaction.conta = conta
-            if form_data['date']:
-                transaction.date = form_data['date']
-            transaction.save()
+            if is_subscription:
+                following = Transaction.objects.filter(
+                    subscription=transaction.subscription,
+                    date__gte=transaction.date,
+                    user=request.user,
+                ).order_by('date')
+                following.update(
+                    name=form_data['name'],
+                    transaction_type=form_data['transaction_type'],
+                    value=parsed_value,
+                    conta=conta,
+                )
+            else:
+                transaction.name = form_data['name']
+                transaction.transaction_type = form_data['transaction_type']
+                transaction.value = parsed_value
+                transaction.category = category
+                transaction.conta = conta
+                if form_data['date']:
+                    transaction.date = form_data['date']
+                transaction.save()
+
             return redirect('transactions:list')
 
         context = _build_edit_transaction_context(request.user, transaction, form_data=form_data, errors=errors)
