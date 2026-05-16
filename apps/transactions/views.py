@@ -261,7 +261,16 @@ def delete_transaction(request, pk):
         return redirect('transactions:update', pk=pk)
 
     if request.method == 'POST':
-        transaction.delete()
+        if transaction.is_fixed:
+            Transaction.objects.filter(
+                user=request.user,
+                name=transaction.name,
+                transaction_type=transaction.transaction_type,
+                is_fixed=True,
+                date__gte=transaction.date,
+            ).delete()
+        else:
+            transaction.delete()
         return redirect('transactions:list')
 
     return render(request, 'transactions/delete_transaction.html', {'transaction': transaction})
