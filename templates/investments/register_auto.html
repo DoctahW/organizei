@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cadastro Automático — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/investments/investments.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="form-page">
+    <header class="form-header">
+      <a href="{% url 'investments:register' %}" class="form-header__back">&#8249;</a>
+      <h1 class="form-header__title">Cadastro Automático</h1>
+      <span class="form-header__spacer"></span>
+    </header>
+
+    <p class="register-copy">
+      A cotação atual é buscada na BRAPI no momento do cadastro e pode ser
+      atualizada depois pelo botão "Atualizar cotação".
+    </p>
+
+    <form method="post" class="form-body">
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="id_tipo">Tipo</label>
+        <select name="tipo" id="id_tipo" required>
+          <option value="">Selecione...</option>
+          <option value="acao" {% if data.tipo == "acao" %}selected{% endif %}>Ação</option>
+          <option value="fii" {% if data.tipo == "fii" %}selected{% endif %}>Fundo Imobiliário</option>
+          <option value="cripto" {% if data.tipo == "cripto" %}selected{% endif %}>Criptomoeda</option>
+        </select>
+        {% if errors.tipo %}<span class="field-error">{{ errors.tipo }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_ticker">Ticker do ativo</label>
+        <input type="text" name="ticker" id="id_ticker" placeholder="Ex.: PETR4" value="{{ data.ticker }}" required>
+        <small class="field-hint">Código do ativo na B3 (4 letras + número).</small>
+        {% if errors.ticker %}<span class="field-error">{{ errors.ticker }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_quantidade">Quantidade de cotas/ações</label>
+        <input type="number" name="quantidade" id="id_quantidade" step="0.0001" min="0" placeholder="Ex.: 10" value="{{ data.quantidade }}" required>
+        <small class="field-hint">Quantas unidades você comprou. Usado para calcular o valor atual (quantidade × cotação).</small>
+        {% if errors.quantidade %}<span class="field-error">{{ errors.quantidade }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_valor_aplicado">Total investido na compra (R$)</label>
+        <input type="number" name="valor_aplicado" id="id_valor_aplicado" step="0.01" min="0" placeholder="Ex.: 350,00" value="{{ data.valor_aplicado }}" required>
+        <small class="field-hint">Quanto você pagou no total ao comprar (preço de compra × quantidade). Serve de referência para calcular o rendimento.</small>
+        {% if errors.valor_aplicado %}<span class="field-error">{{ errors.valor_aplicado }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_data_aplicacao">Data da compra</label>
+        <input type="date" name="data_aplicacao" id="id_data_aplicacao" value="{{ data.data_aplicacao }}" required>
+        {% if errors.data_aplicacao %}<span class="field-error">{{ errors.data_aplicacao }}</span>{% endif %}
+      </div>
+
+      <button type="submit" class="btn-submit">Cadastrar e Buscar Cotação</button>
+    </form>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cadastro Tesouro Direto — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/investments/investments.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="form-page">
+    <header class="form-header">
+      <a href="{% url 'investments:register' %}" class="form-header__back">&#8249;</a>
+      <h1 class="form-header__title">Tesouro Direto</h1>
+      <span class="form-header__spacer"></span>
+    </header>
+
+    <p class="register-copy">
+      Lista atualizada com os títulos disponíveis para resgate (dado oficial
+      do Tesouro Transparente, sincronizado diariamente).
+    </p>
+
+    <form method="post" class="form-body">
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="id_tipo_tesouro">Tipo de título</label>
+        <select name="tipo_tesouro" id="id_tipo_tesouro" required>
+          <option value="">Selecione...</option>
+          {% for tipo in tipos %}
+          <option value="{{ tipo }}" {% if data.tipo_tesouro == tipo %}selected{% endif %}>{{ tipo }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.tipo_tesouro %}<span class="field-error">{{ errors.tipo_tesouro }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_vencimento">Vencimento</label>
+        <select name="vencimento" id="id_vencimento" required disabled>
+          <option value="">Selecione o tipo primeiro...</option>
+        </select>
+        <small class="field-hint" id="titulo_info"></small>
+        {% if errors.vencimento %}<span class="field-error">{{ errors.vencimento }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_valor_aplicado">Quanto você investiu (R$)</label>
+        <input type="number" name="valor_aplicado" id="id_valor_aplicado" step="0.01" min="0" placeholder="Ex.: 500,00" value="{{ data.valor_aplicado }}" required>
+        <small class="field-hint">Valor que saiu do seu bolso. A quantidade de títulos é calculada com base no PU da data de compra.</small>
+        {% if errors.valor_aplicado %}<span class="field-error">{{ errors.valor_aplicado }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_data_aplicacao">Data da compra</label>
+        <input type="date" name="data_aplicacao" id="id_data_aplicacao" value="{{ data.data_aplicacao }}" required>
+        <small class="field-hint">Buscamos o PU oficial dessa data (ou do último dia útil anterior).</small>
+        {% if errors.data_aplicacao %}<span class="field-error">{{ errors.data_aplicacao }}</span>{% endif %}
+      </div>
+
+      <button type="submit" class="btn-submit">Cadastrar e Buscar PU</button>
+    </form>
+  </div>
+</main>
+
+{{ titulos_dict|json_script:"titulos-data" }}
+<script>
+(function () {
+  const titulos = JSON.parse(document.getElementById("titulos-data").textContent);
+  const tipoSelect = document.getElementById("id_tipo_tesouro");
+  const vencSelect = document.getElementById("id_vencimento");
+  const info = document.getElementById("titulo_info");
+  const initialVenc = "{{ data.vencimento|default:'' }}";
+
+  function popularVencimentos() {
+    const tipo = tipoSelect.value;
+    vencSelect.innerHTML = "";
+    info.textContent = "";
+
+    if (!tipo || !titulos[tipo]) {
+      vencSelect.disabled = true;
+      vencSelect.innerHTML = '<option value="">Selecione o tipo primeiro...</option>';
+      return;
+    }
+
+    vencSelect.disabled = false;
+    vencSelect.appendChild(new Option("Selecione o vencimento...", ""));
+    titulos[tipo].forEach(function (t) {
+      const label = t.vencimento_br + " · PU R$ " + t.pu_compra + " · taxa " + t.taxa_compra + "%";
+      const opt = new Option(label, t.vencimento);
+      if (t.vencimento === initialVenc) opt.selected = true;
+      vencSelect.appendChild(opt);
+    });
+
+    atualizarInfo();
+  }
+
+  function atualizarInfo() {
+    const tipo = tipoSelect.value;
+    const venc = vencSelect.value;
+    if (!tipo || !venc) { info.textContent = ""; return; }
+    const t = (titulos[tipo] || []).find(function (x) { return x.vencimento === venc; });
+    if (t) info.textContent = "PU atual de resgate: R$ " + t.pu_compra + " (taxa " + t.taxa_compra + "%)";
+  }
+
+  tipoSelect.addEventListener("change", popularVencimentos);
+  vencSelect.addEventListener("change", atualizarInfo);
+
+  if (tipoSelect.value) popularVencimentos();
+})();
+</script>
+{% endblock %}
