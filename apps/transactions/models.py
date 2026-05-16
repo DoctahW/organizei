@@ -4,6 +4,8 @@ from django.utils import timezone
 
 
 class Category(models.Model):
+    SUBSCRIPTION_CATEGORY_NAME = "Assinatura"
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -23,6 +25,10 @@ class Category(models.Model):
     @property
     def is_global(self):
         return self.user is None
+
+    @property
+    def is_subscription_category(self):
+        return self.user is None and self.name == self.SUBSCRIPTION_CATEGORY_NAME
 
 
 class Transaction(models.Model):
@@ -55,6 +61,15 @@ class Transaction(models.Model):
     )
     date = models.DateField(default=timezone.now, verbose_name="Data")
     is_fixed = models.BooleanField(default=False)
+
+    subscription = models.ForeignKey(
+        'subscriptions.Subscription',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='transactions',
+        verbose_name="Assinatura",
+    )
 
     def __str__(self):
         return f"{self.name} - R$ {self.value} ({self.get_transaction_type_display()})"

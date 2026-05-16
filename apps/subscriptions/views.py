@@ -1,8 +1,56 @@
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required  # <--- ESSA LINHA AQUI
+from django.contrib.auth.decorators import login_required
 from .models import Subscription
+from apps.transactions.models import Transaction, Category
+
+
+def _get_subscription_category():
+    return Category.objects.filter(
+        user=None, name=Category.SUBSCRIPTION_CATEGORY_NAME
+    ).first()
+
+
+def _generate_subscription_occurrences(subscription):
+    base_date = subscription.start_date
+    occurrences = []
+    for i in range(12):
+        target = base_date + relativedelta(months=i)
+        try:
+            vencimento = date(target.year, target.month, base_date.day)
+        except ValueError:
+            next_month = date(target.year, target.month, 1) + relativedelta(months=1)
+            vencimento = next_month - relativedelta(days=1)
+
+        if vencimento < base_date:
+            continue
+        if subscription.end_date and vencimento > subscription.end_date:
+            break
+
+        occurrences.append(vencimento)
+    return occurrences
+
+
+def _create_transactions_for_subscription(subscription, user):
+    category = _get_subscription_category()
+    occurrences = _generate_subscription_occurrences(subscription)
+
+    transactions = [
+        Transaction(
+            user=user,
+            name=subscription.name,
+            transaction_type='WITHDRAWAL',
+            value=subscription.value,
+            category=category,
+            subscription=subscription,
+            date=vencimento,
+            is_fixed=True,
+        )
+        for vencimento in occurrences
+    ]
+    Transaction.objects.bulk_create(transactions)
+
 
 @login_required
 def manage_subscriptions(request):
@@ -11,24 +59,26 @@ def manage_subscriptions(request):
         value = request.POST.get('value').replace('R$', '').replace('.', '').replace(',', '.').strip()
         start_date_raw = request.POST.get('start_date')
         end_date_raw = request.POST.get('end_date') or None
-        
-        if start_date_raw:
-            start_date_input = datetime.strptime(start_date_raw, '%Y-%m-%d').date()
-        else:
-            start_date_input = date.today()
-            
-        if end_date_raw:
-            end_date_input = datetime.strptime(end_date_raw, '%Y-%m-%d').date()
-        else:
-            end_date_input = None
-        
-        Subscription.objects.create(
-            user=request.user, 
-            name=name, 
-            value=value, 
-            start_date=start_date_input, 
-            end_date=end_date_input
+
+        start_date_input = (
+            datetime.strptime(start_date_raw, '%Y-%m-%d').date()
+            if start_date_raw else date.today()
         )
+        end_date_input = (
+            datetime.strptime(end_date_raw, '%Y-%m-%d').date()
+            if end_date_raw else None
+        )
+
+        subscription = Subscription.objects.create(
+            user=request.user,
+            name=name,
+            value=value,
+            start_date=start_date_input,
+            end_date=end_date_input,
+        )
+
+        _create_transactions_for_subscription(subscription, request.user)
+
         return redirect('subscriptions:manage_subscriptions')
 
     subs = Subscription.objects.filter(user=request.user)
@@ -38,7 +88,7 @@ def manage_subscriptions(request):
     total_a_pagar_ano = 0
 
     for sub in subs:
-        val = float(sub.value)        
+        val = float(sub.value)
         base_date = sub.start_date if sub.start_date < today else today
 
         for i in range(12):
@@ -55,36 +105,32 @@ def manage_subscriptions(request):
                 continue
 
             total_geral_ano += val
-
             if vencimento <= today:
                 total_pago_ano += val
             else:
                 total_a_pagar_ano += val
 
     context = {
-        'subscriptions': subs,  
-        'total_geral': total_geral_ano,     
-        'total_pago': total_pago_ano,       
-        'total_a_pagar': total_a_pagar_ano,  
+        'subscriptions': subs,
+        'total_geral': total_geral_ano,
+        'total_pago': total_pago_ano,
+        'total_a_pagar': total_a_pagar_ano,
         'hoje': today,
     }
     return render(request, 'subscriptions/manage_subscriptions.html', context)
 
 
-# === 2. VIEW DE DETALHES (Gera a lista física "occurrences" com os cards retroativos e futuros) ===
 @login_required
 def subscription_detail(request, pk):
     subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
     today = date.today()
-    
+
     occurrences = []
-    # Sempre começa na start_date e gera exatamente 12 parcelas
     base_date = subscription.start_date
     TOTAL_MESES = 12
 
     for i in range(TOTAL_MESES):
         target_month_date = base_date + relativedelta(months=i)
-        
         try:
             vencimento = date(target_month_date.year, target_month_date.month, subscription.start_date.day)
         except ValueError:
@@ -98,7 +144,7 @@ def subscription_detail(request, pk):
 
         occurrences.append({
             'vencimento': vencimento,
-            'is_pago': vencimento <= today
+            'is_pago': vencimento <= today,
         })
 
     context = {
@@ -108,7 +154,6 @@ def subscription_detail(request, pk):
     return render(request, 'subscriptions/subscription_detail.html', context)
 
 
-# === 3. VIEW DE EXCLUSÃO (Caso você já tenha ela aí) ===
 @login_required
 def delete_subscription(request, pk):
     subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
