@@ -19,16 +19,19 @@
         </div>
     </div>
 
-    <div style="margin-top: 40px; text-align: center;">
-        <button onclick="document.getElementById('modal-add').style.display='flex'" 
-                style="background: #111; border: 1px dashed #333; color: #666; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 0.9rem;">
-            + Adicionar nova conta fixa
-        </button>
-    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 30px; width: 100%;">
+        
+        <h3 style="color: #aaa; margin: 0; font-weight: normal; font-size: 1rem; letter-spacing: 0.5px;">
+            Minhas Assinaturas
+        </h3>
 
-    <h3 style="color: #aaa; margin-bottom: 20px; font-weight: normal; font-size: 0.9rem;">
-        Hoje, {{ hoje|date:"d \d\e F"|default:"15 de Maio" }}
-    </h3>
+        <button onclick="document.getElementById('modal-add').style.display='flex'" 
+                style="background: #111; border: 1px solid #222; color: #ffca28; padding: 10px 24px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background 0.2s;"
+                onmouseover="this.style.background='#161616'" onmouseout="this.style.background='#111'">
+            + Nova conta fixa
+        </button>
+        
+    </div>
 
     <div style="display: flex; flex-direction: column; gap: 12px;">
         {% for sub in subscriptions %}
