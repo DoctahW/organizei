@@ -7,5 +7,6 @@ class Subscription(models.Model):
     name = models.CharField(max_length=100)
     value = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateField(default=timezone.now, verbose_name="Data de Início/Vencimento")
+    end_date = models.DateField(blank=True, null=True, verbose_name="Data de Encerramento")
     def __str__(self):
         return f"{self.name} - Dia {self.start_date.day}"

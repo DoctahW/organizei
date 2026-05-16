@@ -19,42 +19,41 @@
         </div>
     </div>
 
-    <h3 style="color: #aaa; margin-bottom: 20px; font-weight: normal; font-size: 0.9rem;">
-        Hoje, {{ hoje|date:"d \d\e F"|default:"15 de Maio" }}
-    </h3>
-    
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-        {% for sub in subscriptions %}
-        <div style="background: #0a0a0a; border-radius: 50px; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #161616; {% if sub.is_pago %}opacity: 0.6;{% endif %}">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="background: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: {% if sub.is_pago %}#d32f2f{% else %}#00c853{% endif %}; transform: rotate(45deg); font-weight: bold; font-size: 1.2rem;">↑</span>
-                </div>
-                <div>
-                    <p style="margin: 0; font-weight: bold; font-size: 0.95rem;">{{ sub.name }}</p>
-                    <p style="margin: 0; font-size: 0.75rem; color: #555;">
-                        Assinatura • Vence em {{ sub.vencimento|date:"d/m/Y" }} 
-                        {% if sub.is_pago %}(Pago neste mês){% else %}(Pendente){% endif %}
-                    </p>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <span style="color: #ff5252; font-weight: bold; font-size: 1rem;">- R$ {{ sub.value|floatformat:2 }}</span>
-                <form action="{% url 'subscriptions:delete_subscription' sub.pk %}" method="post" style="margin: 0;">
-                    {% csrf_token %}
-                    <button type="submit" style="background: none; border: none; color: #333; cursor: pointer; font-size: 1rem;">×</button>
-                </form>
-            </div>
-         </div>
-        {% endfor %}
-    </div>
-
     <div style="margin-top: 40px; text-align: center;">
         <button onclick="document.getElementById('modal-add').style.display='flex'" 
                 style="background: #111; border: 1px dashed #333; color: #666; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 0.9rem;">
             + Adicionar nova conta fixa
         </button>
     </div>
+
+    <h3 style="color: #aaa; margin-bottom: 20px; font-weight: normal; font-size: 0.9rem;">
+        Hoje, {{ hoje|date:"d \d\e F"|default:"15 de Maio" }}
+    </h3>
+
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for sub in subscriptions %}
+        <a href="{% url 'subscriptions:subscription_detail' sub.pk %}" style="text-decoration: none; color: inherit; display: block;">
+            <div style="background: #0a0a0a; border-radius: 50px; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #161616; margin-bottom: 12px; transition: background 0.2s;" onmouseover="this.style.background='#111'" onmouseout="this.style.background='#0a0a0a'">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="background: #1a1a1a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: #ffca28; font-weight: bold; font-size: 1.1rem;">➔</span>
+                    </div>
+                    <div>
+                        <p style="margin: 0; font-weight: bold; font-size: 0.95rem;">{{ sub.name }}</p>
+                        <p style="margin: 0; font-size: 0.75rem; color: #555;">
+                            Início: {{ sub.start_date|date:"d/m/Y" }} 
+                            {% if sub.end_date %} • Término: {{ sub.end_date|date:"d/m/Y" }}{% else %} • Contínuo{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="color: #ff5252; font-weight: bold; font-size: 1rem;">- R$ {{ sub.value|floatformat:2 }}</span>
+                    </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
 
     <div id="modal-add" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; justify-content:center; align-items:center;">
         <div style="background:#111; padding:30px; border-radius:20px; border:1px solid #333; width:90%; max-width:400px;">
