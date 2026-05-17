@@ -27,6 +27,10 @@ const transactionTypeSelect = document.querySelector('.transaction_type_select')
 const sentTransactionBtn = document.querySelector('#sent-transaction-btn');
 const addNewCategoryContainer = document.querySelector('.add-new-category-container');
 const backBtn = document.getElementById('back_button');
+const dateContainer = document.querySelector('.choose-date-container'); 
+const recurringContainer = document.querySelector('.recurring-container');
+const contaSelect = document.querySelector('select[name="conta_id"]');
+const categoryLabel = document.querySelector('label[for="selected-category"]');
 
 
 function closeCategoryModal() {
@@ -41,6 +45,10 @@ function closeCategoryModal() {
         transactionTypeSelect ? transactionTypeSelect.style.display = 'block' : null;
         sentTransactionBtn ? sentTransactionBtn.style.display = 'block' : null;
         addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
+        dateContainer ? dateContainer.style.display = 'flex' : null;
+        recurringContainer ? recurringContainer.style.display = 'block' : null;
+        contaSelect ? contaSelect.style.display = 'block' : null;
+        categoryLabel ? categoryLabel.style.display = 'block' : null;
     }
 };
 
@@ -58,6 +66,10 @@ function openCategoryModal() {
         transactionTypeSelect ? transactionTypeSelect.style.display = 'none' : null;
         sentTransactionBtn ? sentTransactionBtn.style.display = 'none' : null;
         addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
+        dateContainer ? dateContainer.style.display = 'none' : null;
+        recurringContainer ? recurringContainer.style.display = 'none' : null;
+        contaSelect ? contaSelect.style.display = 'none' : null;
+        categoryLabel ? categoryLabel.style.display = 'none' : null;
     }
 
     if (pageTitle) {
@@ -80,6 +92,10 @@ function selectCategory(categoryValue, categoryLabel) {
         transactionTypeSelect ? transactionTypeSelect.style.display = 'block' : null;
         sentTransactionBtn ? sentTransactionBtn.style.display = 'block' : null;
         addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
+        dateContainer ? dateContainer.style.display = 'flex' : null;
+        recurringContainer ? recurringContainer.style.display = 'block' : null;
+        contaSelect ? contaSelect.style.display = 'block' : null;
+        categoryLabel ? categoryLabel.style.display = 'block' : null;
     }
 
     const hiddenCategoryInput = document.getElementById('selected-category');

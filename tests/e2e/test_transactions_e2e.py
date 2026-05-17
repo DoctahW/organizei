@@ -181,3 +181,83 @@ class TransactionsE2ETest(E2EBaseTest):
         self.assertIn("Tipo de Lançamento", body_text)
         self.assertIn("Único", body_text)
         self.assertIn("Recorrente", body_text)
+
+    def test_category_modal_hides_date_and_launch_type(self):
+        """Opening category modal hides date and launch type fields."""
+        self.goto("transactions:create_transaction")
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
+        ).select_by_value("WITHDRAWAL")
+
+        name_input = self.driver.find_element(By.ID, "name-input")
+        name_input.clear()
+        name_input.send_keys("Test Transaction")
+
+        self.driver.execute_script(
+            "document.getElementById('selected-category').value = '';"
+        )
+        self.driver.execute_script(
+            "document.getElementById('value-input').value = '100.00';"
+        )
+
+        # Verify date and launch type are visible before opening modal
+        date_container = self.driver.find_element(By.CLASS_NAME, "choose-date-container")
+        recurring_container = self.driver.find_element(By.CLASS_NAME, "recurring-container")
+
+        self.assertEqual(date_container.value_of_css_property("display"), "block")
+        self.assertIn(recurring_container.value_of_css_property("display"), ["block", "flex"])
+
+        # Open category modal
+        self.driver.find_element(By.ID, "category-btn").click()
+
+        # Wait for modal to be visible
+        self.wait().until(
+            EC.presence_of_element_located((By.ID, "category-modal"))
+        )
+
+        # Verify date and launch type are hidden
+        self.assertEqual(date_container.value_of_css_property("display"), "none")
+        self.assertEqual(recurring_container.value_of_css_property("display"), "none")
+
+    def test_category_selection_shows_date_and_launch_type(self):
+        """Selecting a category shows date and launch type fields again."""
+        self.goto("transactions:create_transaction")
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
+        ).select_by_value("WITHDRAWAL")
+
+        name_input = self.driver.find_element(By.ID, "name-input")
+        name_input.clear()
+        name_input.send_keys("Test Transaction")
+
+        self.driver.execute_script(
+            "document.getElementById('selected-category').value = '';"
+        )
+        self.driver.execute_script(
+            "document.getElementById('value-input').value = '100.00';"
+        )
+
+        # Get containers
+        date_container = self.driver.find_element(By.CLASS_NAME, "choose-date-container")
+        recurring_container = self.driver.find_element(By.CLASS_NAME, "recurring-container")
+
+        # Open category modal
+        self.driver.find_element(By.ID, "category-btn").click()
+
+        # Wait for modal to be visible
+        self.wait().until(
+            EC.presence_of_element_located((By.ID, "category-modal"))
+        )
+
+        # Verify fields are hidden
+        self.assertEqual(date_container.value_of_css_property("display"), "none")
+        self.assertEqual(recurring_container.value_of_css_property("display"), "none")
+
+        # Select first category
+        categories = self.driver.find_elements(By.CLASS_NAME, "modal-option")
+        if categories:
+            categories[0].click()
+
+            # Verify fields are visible again
+            self.assertIn(date_container.value_of_css_property("display"), ["block", "flex"])
+            self.assertIn(recurring_container.value_of_css_property("display"), ["block", "flex"])
