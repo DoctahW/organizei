@@ -56,7 +56,7 @@
             </div>
             
             <span style="color: {% if occ.is_pago %}#aaa{% else %}#ff5252{% endif %}; font-weight: bold; font-size: 1rem;">
-                - R$ {{ subscription.value|floatformat:2 }}
+                - R$ {{ occ.value|floatformat:2 }}
             </span>
         </div>
         {% endfor %}

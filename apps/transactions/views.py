@@ -194,17 +194,38 @@ def edit_transaction(request, pk):
 
         if not errors:
             if is_subscription:
-                following = Transaction.objects.filter(
-                    subscription=transaction.subscription,
+                subscription = transaction.subscription
+                new_date = date.fromisoformat(form_data['date']) if form_data['date'] else transaction.date
+
+                following = list(Transaction.objects.filter(
+                    subscription=subscription,
                     date__gte=transaction.date,
                     user=request.user,
-                ).order_by('date')
-                following.update(
-                    name=form_data['name'],
-                    transaction_type=form_data['transaction_type'],
-                    value=parsed_value,
-                    conta=conta,
-                )
+                ).order_by('date'))
+
+                for i, tx in enumerate(following):
+                    try:
+                        tx.date = date(
+                            (new_date + relativedelta(months=i)).year,
+                            (new_date + relativedelta(months=i)).month,
+                            new_date.day,
+                        )
+                    except ValueError:
+                        next_month = date(
+                            (new_date + relativedelta(months=i)).year,
+                            (new_date + relativedelta(months=i)).month,
+                            1,
+                        ) + relativedelta(months=1)
+                        tx.date = next_month - relativedelta(days=1)
+                    tx.value = parsed_value
+                    tx.conta = conta
+
+                Transaction.objects.bulk_update(following, ['date', 'value', 'conta'])
+
+                subscription.value = parsed_value
+                subscription.start_date = following[0].date if following else new_date
+                subscription.save()
+
             else:
                 transaction.name = form_data['name']
                 transaction.transaction_type = form_data['transaction_type']

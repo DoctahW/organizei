@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Subscription
@@ -83,38 +84,24 @@ def manage_subscriptions(request):
 
     subs = Subscription.objects.filter(user=request.user)
     today = date.today()
-    total_geral_ano = 0
-    total_pago_ano = 0
-    total_a_pagar_ano = 0
 
-    for sub in subs:
-        val = float(sub.value)
-        base_date = sub.start_date if sub.start_date < today else today
+    from django.db.models import Sum as DSum
+    from apps.transactions.models import Transaction as Tx
 
-        for i in range(12):
-            target_month_date = base_date + relativedelta(months=i)
-            try:
-                vencimento = date(target_month_date.year, target_month_date.month, sub.start_date.day)
-            except ValueError:
-                next_month = date(target_month_date.year, target_month_date.month, 1) + relativedelta(months=1)
-                vencimento = next_month - relativedelta(days=1)
-
-            if vencimento < sub.start_date:
-                continue
-            if sub.end_date and vencimento > sub.end_date:
-                continue
-
-            total_geral_ano += val
-            if vencimento <= today:
-                total_pago_ano += val
-            else:
-                total_a_pagar_ano += val
+    totals = Tx.objects.filter(
+        subscription__in=subs,
+        user=request.user,
+    ).aggregate(
+        total_geral=DSum('value'),
+        total_pago=DSum('value', filter=Q(date__lte=today)),
+        total_a_pagar=DSum('value', filter=Q(date__gt=today)),
+    )
 
     context = {
         'subscriptions': subs,
-        'total_geral': total_geral_ano,
-        'total_pago': total_pago_ano,
-        'total_a_pagar': total_a_pagar_ano,
+        'total_geral': totals['total_geral'] or 0,
+        'total_pago': totals['total_pago'] or 0,
+        'total_a_pagar': totals['total_a_pagar'] or 0,
         'hoje': today,
     }
     return render(request, 'subscriptions/manage_subscriptions.html', context)
@@ -125,27 +112,20 @@ def subscription_detail(request, pk):
     subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
     today = date.today()
 
-    occurrences = []
-    base_date = subscription.start_date
-    TOTAL_MESES = 12
+    # Busca as transações reais do banco, ordenadas por data
+    transactions = Transaction.objects.filter(
+        subscription=subscription,
+        user=request.user,
+    ).order_by('date')
 
-    for i in range(TOTAL_MESES):
-        target_month_date = base_date + relativedelta(months=i)
-        try:
-            vencimento = date(target_month_date.year, target_month_date.month, subscription.start_date.day)
-        except ValueError:
-            next_month = date(target_month_date.year, target_month_date.month, 1) + relativedelta(months=1)
-            vencimento = next_month - relativedelta(days=1)
-
-        if vencimento < subscription.start_date:
-            continue
-        if subscription.end_date and vencimento > subscription.end_date:
-            break
-
-        occurrences.append({
-            'vencimento': vencimento,
-            'is_pago': vencimento <= today,
-        })
+    occurrences = [
+        {
+            'vencimento': tx.date,
+            'value': tx.value,
+            'is_pago': tx.date <= today,
+        }
+        for tx in transactions
+    ]
 
     context = {
         'subscription': subscription,

@@ -29,7 +29,6 @@
 
             <input type="hidden" name="transaction_type" value="{{ form_data.transaction_type }}">
             <input type="hidden" name="name" value="{{ form_data.name }}">
-            <input type="hidden" name="date" value="{{ form_data.date }}">
 
             <section class="value_container">
                 <label for="value-input">Valor da Assinatura (R$)</label>
@@ -38,6 +37,14 @@
                     value="{{ form_data.value|default:'' }}"
                     required class="input-box">
                 {% if errors.value %}<p>{{ errors.value }}</p>{% endif %}
+            </section>
+
+            <section class="date_container" style="margin-bottom: 15px;">
+                <label for="date-input">Data de vencimento (a partir desta)</label>
+                <input type="date" name="date" id="date-input"
+                    value="{{ form_data.date|default:'' }}"
+                    required class="input-box">
+                {% if errors.date %}<p style="color: red;">{{ errors.date }}</p>{% endif %}
             </section>
 
             <div class="input-box" style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
