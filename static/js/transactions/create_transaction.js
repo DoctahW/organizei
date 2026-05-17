@@ -77,7 +77,7 @@ function openCategoryModal() {
     }
 
     if (backBtn) {
-        backBtn.setAttribute('href', "javascript:closeCategory()")
+        backBtn.setAttribute('href', "javascript:closeCategoryModal()")
     }
 
 }

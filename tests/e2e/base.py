@@ -43,11 +43,9 @@ class E2EBaseTest(StaticLiveServerTestCase):
         self.driver.find_element(By.ID, "id_password").send_keys(password)
         self.driver.find_element(By.CSS_SELECTOR, ".btn-login").click()
         login_url = f"{self.live_server_url}/accounts/login/"
-        # Wait until we either navigate away from the login URL or the dashboard
-        # main content appears (safer against slow redirects or page rendering).
-        self.wait().until(
-            lambda d: d.current_url != login_url
-            or d.find_elements(By.CSS_SELECTOR, "main.main-content.dashboard")
+        self.wait(timeout=40).until(EC.url_changes(login_url))
+        self.wait(timeout=20).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
         )
 
     def goto(self, reverse_name, **kwargs):

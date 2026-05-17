@@ -128,8 +128,8 @@
             <input type="hidden" name="category_id" id="selected-category"
                 value="{{ form_data.category_id|default:'' }}">
 
-            <section class="category_btn_container input-box" onclick="openCategoryModal()">
-                <button class="category-option" type="button" id="category-btn">
+            <section class="category_btn_container input-box">
+                <button class="category-option" type="button" id="category-btn" onclick="openCategoryModal()">
                     <p id="category-label">
                         {% if form_data.category_id %}
                             {% for cat in categories %}
