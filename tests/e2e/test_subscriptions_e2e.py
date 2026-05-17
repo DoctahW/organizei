@@ -99,9 +99,12 @@ class SubscriptionsE2ETest(E2EBaseTest):
         # Wait and handle potential confirmation or redirect
         # The delete view POSTs and redirects back to manage_subscriptions
         self.wait().until(EC.url_contains("assinaturas"))
+        # Ensure the page DOM finished updating before querying elements
+        self.wait().until(EC.presence_of_element_located((By.TAG_NAME, "body")))
 
         # Verify subscription no longer appears in list
-        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        # Use execute_script to read body text atomically (avoids stale element refs)
+        body_text = self.driver.execute_script("return document.body.innerText;")
         self.assertNotIn("Spotify Teste", body_text)
 
         # Verify subscription was deleted from database

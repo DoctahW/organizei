@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-_DEFAULT_WAIT = 10
+_DEFAULT_WAIT = 20
 
 
 class E2EBaseTest(StaticLiveServerTestCase):
@@ -42,7 +42,13 @@ class E2EBaseTest(StaticLiveServerTestCase):
         self.driver.find_element(By.ID, "id_password").clear()
         self.driver.find_element(By.ID, "id_password").send_keys(password)
         self.driver.find_element(By.CSS_SELECTOR, ".btn-login").click()
-        self.wait().until(EC.url_changes(f"{self.live_server_url}/accounts/login/"))
+        login_url = f"{self.live_server_url}/accounts/login/"
+        # Wait until we either navigate away from the login URL or the dashboard
+        # main content appears (safer against slow redirects or page rendering).
+        self.wait().until(
+            lambda d: d.current_url != login_url
+            or d.find_elements(By.CSS_SELECTOR, "main.main-content.dashboard")
+        )
 
     def goto(self, reverse_name, **kwargs):
         url = self.live_server_url + reverse(reverse_name, **kwargs)

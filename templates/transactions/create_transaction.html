@@ -28,15 +28,18 @@
             <option value="{{ value }}" {% if form_data.transaction_type == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
+        {% if errors.transaction_type %}<p class="field-error">{{ errors.transaction_type }}</p>{% endif %}
 
         <section class="name_container name_input">
             <label for="name-input" class="name_label">Nome da Transação</label>
             <input type="text" name="name" placeholder="Ex.: Conta de energia" value="{{ form_data.name|default:'' }}" required class="input-box" id="name-input">
+            {% if errors.name %}<p class="field-error">{{ errors.name }}</p>{% endif %}
         </section>
 
         <section class="value_container">
             <label for="value-input">Valor da Transação (R$)</label>
             <input type="text" inputmode="decimal" id="value-input" name="value" placeholder="0,00" value="{{ form_data.value|default:'' }}" required class="input-box">
+            {% if errors.value %}<p class="field-error">{{ errors.value }}</p>{% endif %}
         </section>
 
         <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
@@ -47,9 +50,10 @@
             </option>
             {% endfor %}
         </select>
+        {% if errors.conta_id %}<p class="field-error">{{ errors.conta_id }}</p>{% endif %}
 
         <label for="selected-category">Categoria</label>
-        <input type="hidden" name="category_id" id="selected-category" value="{{ form_data.category_id|default:8 }}">
+        <input type="hidden" name="category_id" id="selected-category" value="{{ form_data.category_id|default:'' }}">
         <section class="category_btn_container input-box" onclick="openCategoryModal()">
             <button class="category-option" type="button" id="category-btn">
                 <p>Selecionar categoria</p><span>></span>
@@ -66,7 +70,7 @@
 
         <section class="choose-date-container">
             <label for="date-input">Data da Transação</label>
-            <input type="date" name="date" id="date-input" required class="input-box">
+            <input type="date" name="date" id="date-input" class="input-box">
 
             <div class="recurring-container" style="margin-top: 20px;">
                 <label>Tipo de Lançamento:</label>
