@@ -1,55 +1,83 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Definir Limite — Organizei{% endblock %}
+{% block title %}Novo Orçamento — Organizei{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/budget/budget.css' %}">
+<link rel="stylesheet" href="{% static 'css/goals/goal_form.css' %}">
+<link rel="stylesheet" href="{% static 'css/transactions/create_transaction.css' %}">
 {% endblock %}
 
 {% block content %}
-<main class="main-content">
-    <div class="budget-container budget-container--narrow">
-        <div class="budget-header-centered">
-            <h1 class="tx-group__label">Limite Mensal</h1>
-        </div>
+<div class="form-page">
 
-        <div class="budget-hero budget-hero--form">
-            <h2 class="budget-hero__label">
-                Determine o seu limite de gastos:  <br>
-            </h2>
+  <header class="form-header">
+    <a href="{% url 'budget:list' %}" class="form-header__back">&#8249;</a>
+    <h1 class="form-header__title">Novo Orçamento</h1>
+    <span class="form-header__spacer"></span>
+  </header>
 
-            <form method="POST" class="budget-form">
-                {% csrf_token %}
-                <div class="budget-input-group">
-                    <span class="budget-input-prefix">R$</span>
-                    <input
-                        type="number" 
-                        step="10" 
-                        name="limit" 
-                        id="limit"
-                        min="0"
-                        value="{{ budget.limit|default:'' }}"
-                        required
-                        placeholder="0,00"
-                        class="budget-input-large"
-                    >
-                    <div class="budget-input-controls">
-                        <button type="button" onclick="document.getElementById('limit').stepUp()" class="control-btn">▲</button>
-                        <button type="button" onclick="document.getElementById('limit').stepDown()" class="control-btn">▼</button>
-                    </div>
-                </div>
-
-                {% if errors.limit %}
-                <p class="form-error">{{ errors.limit }}</p>
-                {% endif %}
-
-                <div class="budget-form-actions">
-                    <a href="{% url 'budget:list' %}" class="button-glass">Cancelar</a>
-                    <button type="submit" class="button-glass button-glass--primary">Salvar</button>
-                </div>
-            </form>
-        </div>
+  <form method="post" class="form-body">
+    {% csrf_token %}
+    
+    <div class="field">
+      <label for="selected-category">Categoria</label>
+      
+      <input type="hidden" name="category" id="selected-category" value="{{ request.POST.category }}" required>
+      
+      <section class="category_btn_container input-box" onclick="openCategoryModal()">
+          <button class="category-option" type="button" id="category-btn">
+              <p>Selecionar categoria</p><span>&gt;</span>
+          </button>
+      </section>
+      
+      <section class="category_modal_container" id="category-modal" style="display: none; margin-top: 12px; width: 100%;">
+          {% for category in categories %}
+          <div class="category-option modal-option input-box" onclick="selectCategory('{{ category.id }}', '{{ category.name }}')">
+              <p>{{ category.name }}</p>
+           </div>
+          {% endfor %}
+          <a id="new-category-btn" class="button-glass" href="{% url 'transactions:create_category' %}">
+              <p>Adicionar Nova Categoria</p>
+          </a>
+      </section>
+      {% if errors.category %}<span class="field-error">{{ errors.category }}</span>{% endif %}
     </div>
-</main>
+
+    <div class="field">
+      <label for="id_limit">Valor do limite (R$)</label>
+      <input type="number" name="limit" id="id_limit" placeholder="0,00" step="0.01" value="{{ request.POST.limit }}">
+      {% if errors.limit %}<span class="field-error">{{ errors.limit }}</span>{% endif %}
+    </div>
+
+    <button type="submit" class="btn-submit">Salvar Orçamento</button>
+  </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Função para abrir/fechar o modal de categorias
+  function openCategoryModal() {
+      const modal = document.getElementById('category-modal');
+      if (modal.style.display === 'none' || modal.style.display === '') {
+          modal.style.display = 'block';
+      } else {
+          modal.style.display = 'none';
+      }
+  }
+
+  // Função para capturar o clique, preencher o input escondido e atualizar o texto do botão
+  function selectCategory(id, name) {
+      document.getElementById('selected-category').value = id;
+      
+      const btnText = document.getElementById('category-btn').querySelector('p');
+      if (btnText) {
+          btnText.innerText = name;
+      }
+      
+      document.getElementById('category-modal').style.display = 'none';
+  }
+</script>
 {% endblock %}
