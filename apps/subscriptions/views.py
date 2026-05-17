@@ -82,7 +82,6 @@ def manage_subscriptions(request):
 
         return redirect('subscriptions:manage_subscriptions')
 
-    from django.db.models import Count
     subs = Subscription.objects.filter(user=request.user).prefetch_related('transactions')
     today = date.today()
 
