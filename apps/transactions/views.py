@@ -163,6 +163,7 @@ def get_transactions(request):
         'prev_year': prev_year,
         'next_month': next_month,
         'next_year': next_year,
+        'hoje': today,
     })
 
 
