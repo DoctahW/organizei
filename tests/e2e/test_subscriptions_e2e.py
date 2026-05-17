@@ -96,11 +96,12 @@ class SubscriptionsE2ETest(E2EBaseTest):
         delete_btn = self.driver.find_element(By.XPATH, "//button[contains(., 'Excluir')]")
         delete_btn.click()
 
-        # Wait and handle potential confirmation or redirect
-        # The delete view POSTs and redirects back to manage_subscriptions
-        self.wait().until(EC.url_contains("assinaturas"))
-        # Ensure the page DOM finished updating before querying elements
-        self.wait().until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        # Wait for the redirect back to the subscriptions list.
+        manage_url = self.live_server_url + reverse('subscriptions:manage_subscriptions')
+        self.wait().until(EC.url_to_be(manage_url))
+        self.wait().until(
+            EC.presence_of_element_located((By.XPATH, "//*[contains(text(),'Minhas Assinaturas')]"))
+        )
 
         # Verify subscription no longer appears in list
         # Use execute_script to read body text atomically (avoids stale element refs)
