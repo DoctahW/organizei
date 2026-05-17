@@ -66,7 +66,7 @@
             <span>{{ tx.get_transaction_type_display }}</span>
             <span class="tx-item__meta-dot">·</span>
             <span>{{ tx.date|date:"d/m/Y" }}</span>
-            {% if tx.date > hoje %}<span class="tx-item__meta-dot">·</span><span style="color: #555; font-size: 0.75rem;">agendado</span>{% endif %}
+            {% if tx.date > hoje %}<span class="tx-item__meta-dot">·</span><span style="color: #ffca28; font-size: 0.75rem;">Agendado</span>{% endif %}
           </div>
         </div>
         <p class="tx-item__amount {% if tx.transaction_type == 'WITHDRAWAL' %}tx-item__amount--expense{% else %}tx-item__amount--income{% endif %}">
