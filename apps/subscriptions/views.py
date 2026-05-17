@@ -82,8 +82,12 @@ def manage_subscriptions(request):
 
         return redirect('subscriptions:manage_subscriptions')
 
-    subs = Subscription.objects.filter(user=request.user)
+    from django.db.models import Count
+    subs = Subscription.objects.filter(user=request.user).prefetch_related('transactions')
     today = date.today()
+
+    for sub in subs:
+        sub.remaining_months = sub.transactions.filter(date__gte=today).count()
 
     from django.db.models import Sum as DSum
     from apps.transactions.models import Transaction as Tx
@@ -112,7 +116,6 @@ def subscription_detail(request, pk):
     subscription = get_object_or_404(Subscription, pk=pk, user=request.user)
     today = date.today()
 
-    # Busca as transações reais do banco, ordenadas por data
     transactions = Transaction.objects.filter(
         subscription=subscription,
         user=request.user,
