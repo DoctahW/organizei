@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/transactions/list_transactions.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="{% url 'subscriptions:manage_subscriptions' %}" style="display:flex; align-items:center; color: var(--text-muted); text-decoration:none; flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+        </a>
+        <p style="font-size: 1.5rem; font-weight: 800; color: var(--text-body); margin: 0;">{{ subscription.name }}</p>
+    </div>
+
+    <div class="hero-card" style="justify-content: space-between; padding: 30px 40px;">
+        <div>
+            <p class="stat-label" style="text-align: left;">Valor Mensal</p>
+            <p class="stat-value" style="color: var(--text-body); text-align: left;">R$ {{ subscription.value|floatformat:2 }}</p>
+            <p style="color: var(--text-muted); margin-top: 8px; font-size: 0.85rem;">
+                Iniciado em <span style="color: var(--text-body);">{{ subscription.start_date|date:"d/m/Y" }}</span>
+                {% if subscription.end_date %}
+                &nbsp;·&nbsp; Término em <span style="color: var(--text-body);">{{ subscription.end_date|date:"d/m/Y" }}</span>
+                {% endif %}
+            </p>
+        </div>
+        <form action="{% url 'subscriptions:delete_subscription' subscription.pk %}" method="post" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" class="button-glass" style="color: var(--color-expense, #ef6e6e); border-color: var(--color-expense-border, rgba(239,110,110,0.22)); background: var(--color-expense-bg, rgba(239,110,110,0.09));">
+                Excluir
+            </button>
+        </form>
+    </div>
+
+    <p style="font-size: 24px; font-weight: 800; color: var(--text-body); line-height: 1.5;">Cobranças</p>
+
+    <div class="tx-groups">
+        {% for occ in occurrences %}
+        <div class="tx-item glass" style="{% if occ.is_pago %}opacity: 0.4;{% endif %}">
+            <div class="tx-item__icon {% if occ.is_pago %}tx-item__icon--income{% else %}tx-item__icon--expense{% endif %}">
+                {% if occ.is_pago %}
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                    <polyline points="2 7 6 11 12 3"/>
+                </svg>
+                {% else %}
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                    <line x1="12" y1="2" x2="2" y2="12"/>
+                    <polyline points="9 12 2 12 2 5"/>
+                </svg>
+                {% endif %}
+            </div>
+            <div class="tx-item__info">
+                <p class="tx-item__name">Vencimento em {{ occ.vencimento|date:"d/m/Y" }}</p>
+                <div class="tx-item__meta">
+                    {% if occ.is_pago %}
+                    <span>Pago</span>
+                    {% else %}
+                    <span style="color: var(--color-primary);">Agendado</span>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="tx-item__amount {% if occ.is_pago %}tx-item__amount--income{% else %}tx-item__amount--expense{% endif %}">
+                - R$ {{ occ.value|floatformat:2 }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+</main>
+{% endblock %}

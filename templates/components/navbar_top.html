@@ -19,7 +19,7 @@
         <a href="{% url 'budget:list' %}" class="button-glass {% if request.resolver_match.namespace == 'budget' %}button-glass--active{% endif %}" {% if request.resolver_match.namespace == 'budget' %}aria-current="page"{% endif %}>
             Orçamentos
         </a>
-        <a href="#" class="button-glass">Assinaturas</a>
+        <a href="{% url 'subscriptions:manage_subscriptions' %}" class="button-glass">Assinaturas</a>
         </nav>
 
         <div class="navbar__actions">

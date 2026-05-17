@@ -61,11 +61,12 @@
           {% endif %}
         </div>
         <div class="tx-item__info">
-          <p class="tx-item__name">{{ tx.name }} - {{ tx.category}}</p>
+          <p class="tx-item__name">{{ tx.name }}{% if tx.category %} - {{ tx.category }}{% endif %}</p>
           <div class="tx-item__meta">
             <span>{{ tx.get_transaction_type_display }}</span>
             <span class="tx-item__meta-dot">·</span>
             <span>{{ tx.date|date:"d/m/Y" }}</span>
+            {% if tx.date > hoje %}<span class="tx-item__meta-dot">·</span><span style="color: #ffca28; font-size: 0.75rem;">Agendado</span>{% endif %}
           </div>
         </div>
         <p class="tx-item__amount {% if tx.transaction_type == 'WITHDRAWAL' %}tx-item__amount--expense{% else %}tx-item__amount--income{% endif %}">

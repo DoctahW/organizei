@@ -58,7 +58,28 @@ input::selection {
     background-color: #444;
 }
 
-label, select {
+input[type="date"] {
+    margin-top: 15px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) grayscale(1) brightness(200%);
+}
+
+.recurring-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.recurring-btns {
+    display: flex;
+    gap: 10px;
+}
+
+label,
+select {
     font-size: 13px;
     font-weight: 600;
     color: #e0e0e0;
@@ -73,13 +94,16 @@ p {
     letter-spacing: -0.07px;
     line-height: 1.4;
 }
-.value_container, .name_container {
+
+.value_container,
+.name_container {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.input-box, select{
+.input-box,
+select {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 12px 16px;
@@ -135,9 +159,16 @@ select {
     font-weight: bold;
     cursor: pointer;
 }
-#new-category-btn{
+
+#new-category-btn {
     background-color: rgba(255, 255, 255, 0.027) !important;
     color: #e0e0e0 !important;
+    cursor: pointer;
+}
+
+.recurring-btns button {
+    background-color: rgba(255, 255, 255, 0.027);
+    color: #e0e0e0;
     cursor: pointer;
 }
 

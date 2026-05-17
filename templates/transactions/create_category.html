@@ -21,14 +21,22 @@
         </header>
     
     <section class="add-new-category-container glass">
-        <form action="{% url 'transactions:create_category' %}" method="post">
-            {% csrf_token %}
-            <label for="new-category-name">Nome da nova categoria</label>
-            <input type="text" name="new_category_name" id="new-category-name" placeholder="Ex: Compras, Emergências, Renda extra" class="input-box">
-            <button id="save-new-category-btn" class="button-glass" onclick="saveNewCategory()" type="submit">
-                <p>Salvar Categoria</p>
-            </button>
-        </form>
+        <form method="post" class="form-transaction-container glass">
+    {% csrf_token %}
+    
+        <section class="name_container name_input">
+            <label for="name-input" class="name_label">Nome da Nova Categoria</label>
+            <input type="text" 
+                name="name"  
+                id="name-input" 
+                placeholder="Ex: Assinaturas, Lazer..." 
+                required 
+                class="input-box">
+        </section>
+        <button type="submit" class="button-glass">
+            Salvar Categoria
+        </button>
+</form>
     </section>
 </section>
 
