@@ -57,27 +57,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-  // Função para abrir/fechar o modal de categorias
-  function openCategoryModal() {
-      const modal = document.getElementById('category-modal');
-      if (modal.style.display === 'none' || modal.style.display === '') {
-          modal.style.display = 'block';
-      } else {
-          modal.style.display = 'none';
-      }
-  }
-
-  // Função para capturar o clique, preencher o input escondido e atualizar o texto do botão
-  function selectCategory(id, name) {
-      document.getElementById('selected-category').value = id;
-      
-      const btnText = document.getElementById('category-btn').querySelector('p');
-      if (btnText) {
-          btnText.innerText = name;
-      }
-      
-      document.getElementById('category-modal').style.display = 'none';
-  }
-</script>
+<script src="{% static 'js/budget/set_budget.js' %}"></script>
 {% endblock %}
