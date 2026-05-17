@@ -183,6 +183,7 @@ def edit_transaction(request, pk):
             ),
             'conta_id': request.POST.get('conta_id', '').strip(),
             'date': request.POST.get('date', '').strip(),
+            'is_fixed': request.POST.get('is_fixed', 'off'),
         }
         errors, parsed_value, category, conta = validate_transaction_data(
             form_data, request.user, _get_categories_for_user
@@ -234,6 +235,7 @@ def edit_transaction(request, pk):
                 transaction.conta = conta
                 if form_data['date']:
                     transaction.date = form_data['date']
+                transaction.is_fixed = form_data['is_fixed'] == 'on'
                 transaction.save()
 
             return redirect('transactions:list')
@@ -248,6 +250,7 @@ def edit_transaction(request, pk):
         'category_id': str(transaction.category.pk) if transaction.category else '',
         'conta_id': str(transaction.conta.pk) if transaction.conta else '',
         'date': transaction.date.strftime('%Y-%m-%d') if transaction.date else '',
+        'is_fixed': 'on' if transaction.is_fixed else 'off',
     }
     context = _build_edit_transaction_context(request.user, transaction, form_data=form_data)
     return render(request, 'transactions/edit_transaction.html', context)

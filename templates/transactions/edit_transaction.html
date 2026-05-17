@@ -102,6 +102,18 @@
                 {% if errors.date %}<p style="color: red;">{{ errors.date }}</p>{% endif %}
             </section>
 
+            <div class="recurring-container" style="margin-bottom: 15px;">
+                <label>Tipo de Lançamento:</label>
+                <div style="display: flex; gap: 20px; margin-top: 10px; color: white;">
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="is_fixed" value="off" {% if form_data.is_fixed == 'off' or form_data.is_fixed == False %}checked{% endif %}> Único
+                    </label>
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="is_fixed" value="on" {% if form_data.is_fixed == 'on' or form_data.is_fixed == True %}checked{% endif %}> Recorrente (12 meses)
+                    </label>
+                </div>
+            </div>
+
             <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
                 <option value="">Selecione a conta bancária (Opcional)</option>
                 {% for conta in contas %}
