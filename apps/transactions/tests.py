@@ -5,6 +5,7 @@ from unittest.mock import patch
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from .models import Transaction, Category
 
@@ -30,7 +31,7 @@ class TransactionModelTest(TestCase):
         t = Transaction.objects.create(
             user=self.user, name="Teste", value=Decimal("10.00"), transaction_type="DEPOSIT"
         )
-        self.assertEqual(t.date, date.today())
+        self.assertLessEqual(abs((t.date - timezone.now()).total_seconds()), 1)
 
     def test_cascade_delete_with_user(self):
         Transaction.objects.create(

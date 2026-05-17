@@ -84,7 +84,7 @@ class SubscriptionsE2ETest(E2EBaseTest):
         self.assertIn("Spotify Teste", body_text)
 
         # Click on the subscription to go to detail page
-        sub_link = self.driver.find_element(By.XPATH, f"//p[contains(text(), 'Spotify Teste')]")
+        sub_link = self.driver.find_element(By.XPATH, "//p[contains(text(), 'Spotify Teste')]")
         sub_link.click()
 
         # Wait for subscription detail page to load
