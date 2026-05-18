@@ -106,6 +106,10 @@ def get_patrimonio_series(user, period: str) -> dict:
     today = localdate()
     transactions = user.transaction_set.all()
 
+    investment_total = user.investments.aggregate(
+        total=Coalesce(Sum("valor_atual"), Decimal("0"))
+    )["total"]
+
     if period == "1M":
         start_date = today - timedelta(days=29)
 
@@ -125,7 +129,7 @@ def get_patrimonio_series(user, period: str) -> dict:
             daily_nets[tx["date"]] = daily_nets.get(tx["date"], Decimal("0")) + delta
 
         series = []
-        running = initial_balance
+        running = initial_balance + investment_total
         d = start_date
         while d <= today:
             running += daily_nets.get(d, Decimal("0"))
@@ -140,8 +144,12 @@ def get_patrimonio_series(user, period: str) -> dict:
         else: 
             first_tx = transactions.order_by("date").first()
             if not first_tx:
-                return _empty_patrimonio(period)
-            months = _months_range(date(first_tx.date.year, first_tx.date.month, 1), today)
+                if investment_total > 0:
+                    months = [date(today.year, today.month, 1)]
+                else:
+                    return _empty_patrimonio(period)
+            else:
+                months = _months_range(date(first_tx.date.year, first_tx.date.month, 1), today)
 
         if not months:
             return _empty_patrimonio(period)
@@ -171,7 +179,7 @@ def get_patrimonio_series(user, period: str) -> dict:
             monthly_nets[key] = monthly_nets.get(key, Decimal("0")) + delta
 
         series = []
-        running = initial_balance
+        running = initial_balance + investment_total
         for month_start in months:
             key = (month_start.year, month_start.month)
             running += monthly_nets.get(key, Decimal("0"))
@@ -307,6 +315,11 @@ def build_dashboard_context(user) -> dict:
         )
     )["total"]
 
+    investment_total = user.investments.aggregate(
+        total=Coalesce(Sum("valor_atual"), Decimal("0"))
+    )["total"]
+    total_balance = total_balance + investment_total
+
     month_data = get_movimentacao_by_month(user, today)
     month_summary = {
         "reference_month": month_data["reference_month"],
@@ -358,6 +371,7 @@ def build_dashboard_context(user) -> dict:
     is_empty = (
         not transactions.exists()
         and not user.goals.exists()
+        and not user.investments.exists()
         and budget_status is None
     )
 
