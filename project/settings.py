@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "apps.subscriptions",
     "apps.budget",
     "apps.bank_accounts",
+    "apps.onboarding",
 ]
 
 MIDDLEWARE = [
@@ -76,6 +77,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.onboarding.middleware.RequireBankAccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
