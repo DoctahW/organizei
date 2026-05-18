@@ -7,9 +7,6 @@
     </a>
     <div class="main_section" aria-label="Navegação principal">
         <nav class="navbar__nav">
-        <a href="{% url 'dashboard:home' %}" class="button-glass {% if request.resolver_match.namespace == 'dashboard' %}button-glass--active{% endif %}">
-            Painel
-        </a>
         <a href="{% url 'transactions:list' %}" class="button-glass {% if request.resolver_match.namespace == 'transactions' %}button-glass--active{% endif %}">
             Transações
         </a>
@@ -20,6 +17,9 @@
             Orçamentos
         </a>
         <a href="{% url 'investments:list' %}" class="button-glass {% if request.resolver_match.namespace == 'investments' %}button-glass--active{% endif %}" {% if request.resolver_match.namespace == 'investments' %}aria-current="page"{% endif %}>Investimentos</a>
+        <a href="{% url 'subscriptions:manage_subscriptions' %}" class="button-glass {% if request.resolver_match.namespace == 'subscriptions' %}button-glass--active{% endif %}">
+            Assinaturas
+        </a>
         </nav>
 
         <div class="navbar__actions">
