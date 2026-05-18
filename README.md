@@ -221,6 +221,9 @@ Conseguimos resolver a grande maioria das sugestões e bugs que encontramos no s
 Ao final da entrega, algumas Issues ainda permaneceram, mas estas em sua maioria são sugestões de melhorias para a aplicação.
 ![Issues em aberto restantes](docs/imgs/open_issues_4.png)
 
+### `CONTRIBUTING.md`
+Criado arquivo explicando como pode-se contribuir com o projeto:
+[Acessar `CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 
 ### Programação em par (atualização)
 Nesta entrega, optamos por não utilizar a programação em par como nas outras entregas. Os desenvolvedores realizaram as atividades designadas e os demais membros se disponibilizaram para ajudar a cada um caso estivesse com dificuldades. Também foram designadas pessoas para fazer uma revisão de código antes de fazer merge nos Pull Requests para verificar se tudo estava de acordo com os parâmetros. Todos contribuiram para esta última entrega.
