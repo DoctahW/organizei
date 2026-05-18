@@ -4,7 +4,8 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from apps.transactions.models import Transaction
+# Importa Category junto com Transaction
+from apps.transactions.models import Transaction, Category
 from apps.bank_accounts.models import Conta, Bank
 from apps.goals.models import Goal
 from apps.budget.models import Budget
@@ -12,9 +13,10 @@ from apps.investments.models import Investment
 from .services import build_dashboard_context, get_patrimonio_series
 
 
-def make_transaction(user, value, transaction_type, days_ago=0, conta=None):
+def make_transaction(user, value, transaction_type, days_ago=0, conta=None, category=None):
+    # Transação de teste aceita receber uma categoria
     t = Transaction.objects.create(
-        user=user, name="tx", value=value, transaction_type=transaction_type, conta=conta
+        user=user, name="tx", value=value, transaction_type=transaction_type, conta=conta, category=category
     )
     if days_ago:
         Transaction.objects.filter(pk=t.pk).update(
@@ -33,8 +35,10 @@ def make_goal(user, deadline_days=30, is_completed=False, target=Decimal("1000.0
     )
 
 
-def make_budget(user, limit):
-    return Budget.objects.create(user=user, month=date.today().replace(day=1), limit=limit)
+def make_budget(user, limit, category=None):
+    if category is None:
+        category, _ = Category.objects.get_or_create(name="Categoria Teste Geral", user=user)
+    return Budget.objects.create(user=user, month=date.today().replace(day=1), limit=limit, category=category)
 
 
 def make_investment(user, valor_atual=Decimal("500.00")):
@@ -75,14 +79,16 @@ class DashboardServiceTests(TestCase):
         self.assertEqual(ctx["priority_goal"].pk, closer.pk)
 
     def test_budget_level_warning_at_80_percent_boundary(self):
-        make_budget(self.user, Decimal("100.00"))
-        make_transaction(self.user, Decimal("80.00"), "WITHDRAWAL", conta=self.conta)
+        category, _ = Category.objects.get_or_create(name="Geral", user=self.user)
+        make_budget(self.user, Decimal("100.00"), category=category)
+        make_transaction(self.user, Decimal("80.00"), "WITHDRAWAL", conta=self.conta, category=category)
         ctx = build_dashboard_context(self.user)
         self.assertEqual(ctx["budget_status"]["level"], "warning")
 
     def test_budget_level_exceeded_at_100_percent_boundary(self):
-        make_budget(self.user, Decimal("100.00"))
-        make_transaction(self.user, Decimal("100.00"), "WITHDRAWAL", conta=self.conta)
+        category, _ = Category.objects.get_or_create(name="Geral", user=self.user)
+        make_budget(self.user, Decimal("100.00"), category=category)
+        make_transaction(self.user, Decimal("100.00"), "WITHDRAWAL", conta=self.conta, category=category)
         ctx = build_dashboard_context(self.user)
         self.assertEqual(ctx["budget_status"]["level"], "exceeded")
 

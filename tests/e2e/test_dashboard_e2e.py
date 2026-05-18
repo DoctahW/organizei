@@ -6,8 +6,10 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from apps.budget.models import Budget
 from apps.goals.models import Goal
+from apps.transactions.models import Category
 from apps.transactions.models import Transaction
 from apps.bank_accounts.models import Conta, Bank
+
 
 from .base import E2EBaseTest
 
@@ -57,10 +59,15 @@ class DashboardE2ETest(E2EBaseTest):
         """When spending exceeds the monthly budget the dashboard movimentação card
         shows the exceeded alert."""
         today = date.today()
+
+        # Criando a categoria necessária para o banco de testes
+        category = Category.objects.create(name="Alimentação", user=self.user)
+
         Budget.objects.create(
             user=self.user,
             month=date(today.year, today.month, 1),
             limit=500,
+            category=category,
         )
         Transaction.objects.create(
             user=self.user,
@@ -69,6 +76,7 @@ class DashboardE2ETest(E2EBaseTest):
             transaction_type="WITHDRAWAL",
             date=today,
             conta=self.conta,
+            category=category,
         )
 
         self.goto("dashboard:home")

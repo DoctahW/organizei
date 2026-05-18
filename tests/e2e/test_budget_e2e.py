@@ -4,7 +4,7 @@ from django.test import tag
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-from apps.transactions.models import Transaction
+from apps.transactions.models import Transaction, Category # Ajustado import
 from apps.bank_accounts.models import Conta, Bank
 
 from .base import E2EBaseTest
@@ -17,14 +17,22 @@ class BudgetE2ETest(E2EBaseTest):
         self.login_via_ui()
         self.bank = Bank.objects.create(name="Test Bank")
         self.conta = Conta.objects.create(bank=self.bank, usuario=self.user, account_type="corrente", number="12345")
+        # Criando a categoria necessária para o banco de testes
+        self.category = Category.objects.create(name="Alimentação", user=self.user)
 
     def _set_budget_via_ui(self, limit_value):
         self.goto("budget:set_budget")
-        limit_input = self.driver.find_element(By.ID, "limit")
+        
+        # Seleciona a categoria exigida na tela antes de preencher o limite
+        self.driver.find_element(By.ID, "category-btn").click()
+        self.driver.find_element(By.XPATH, "//p[contains(text(), 'Alimentação')]").click()
+        
+        limit_input = self.driver.find_element(By.ID, "id_limit")
         limit_input.clear()
         limit_input.send_keys(str(limit_value))
         set_url = self.driver.current_url
-        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+        
+        self.driver.find_element(By.CSS_SELECTOR, ".btn-submit").click()
         # Wait until we leave the set_budget page (redirected to list)
         self.wait().until(EC.url_changes(set_url))
 
@@ -36,6 +44,7 @@ class BudgetE2ETest(E2EBaseTest):
             transaction_type="WITHDRAWAL",
             date=date.today(),
             conta=self.conta,
+            category=self.category,
         )
 
     def test_define_limit_and_see_percentage(self):
@@ -80,14 +89,17 @@ class BudgetE2ETest(E2EBaseTest):
         """Submitting an empty budget limit shows a validation error."""
         self.goto("budget:set_budget")
         
+        self.driver.find_element(By.ID, "category-btn").click()
+        self.driver.find_element(By.XPATH, "//p[contains(text(), 'Alimentação')]").click()
+        
         self.driver.execute_script(
-            "document.getElementById('limit').removeAttribute('required');"
+            "document.getElementById('id_limit').removeAttribute('required');"
         )
         
-        limit_input = self.driver.find_element(By.ID, "limit")
+        limit_input = self.driver.find_element(By.ID, "id_limit")
         limit_input.clear()
         
-        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+        self.driver.find_element(By.CSS_SELECTOR, ".btn-submit").click()
 
         self.wait().until(
             EC.presence_of_element_located(
@@ -101,16 +113,21 @@ class BudgetE2ETest(E2EBaseTest):
         """Submitting a negative budget limit shows a validation error."""
         self.goto("budget:set_budget")
         
-        limit_input = self.driver.find_element(By.ID, "limit")
+        # Seleciona a categoria
+        self.driver.find_element(By.ID, "category-btn").click()
+        self.driver.find_element(By.XPATH, "//p[contains(text(), 'Alimentação')]").click()
+        
+        limit_input = self.driver.find_element(By.ID, "id_limit")
         limit_input.clear()
         
         self.driver.execute_script(
-            "var el = document.getElementById('limit');"
+            "var el = document.getElementById('id_limit');"
             "el.removeAttribute('min');"
             "el.value = '-50';"
         )
         
-        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+        # CORREÇÃO: Mudou para ".btn-submit"
+        self.driver.find_element(By.CSS_SELECTOR, ".btn-submit").click()
 
         self.wait().until(
             EC.presence_of_element_located(
@@ -124,15 +141,20 @@ class BudgetE2ETest(E2EBaseTest):
         """Submitting an invalid number format shows a validation error."""
         self.goto("budget:set_budget")
         
+        # Seleciona a categoria
+        self.driver.find_element(By.ID, "category-btn").click()
+        self.driver.find_element(By.XPATH, "//p[contains(text(), 'Alimentação')]").click()
+        
         self.driver.execute_script(
-            "document.getElementById('limit').type = 'text';"
+            "document.getElementById('id_limit').type = 'text';"
         )
         
-        limit_input = self.driver.find_element(By.ID, "limit")
+        limit_input = self.driver.find_element(By.ID, "id_limit")
         limit_input.clear()
         limit_input.send_keys("abc")
         
-        self.driver.find_element(By.CSS_SELECTOR, ".button-glass--primary").click()
+        # CORREÇÃO: Mudou para ".btn-submit"
+        self.driver.find_element(By.CSS_SELECTOR, ".btn-submit").click()
 
         self.wait().until(
             EC.presence_of_element_located(
