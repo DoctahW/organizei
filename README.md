@@ -180,6 +180,50 @@ Algumas dessas issues inclui a melhora de alguma funcionalidade do sistema e alg
 <img width="2286" height="561" alt="screenshot-2026-04-27_19-50-32" src="https://github.com/user-attachments/assets/cf5d14cc-6cf1-47ef-8646-5726f38aadf4" />
 
 </details>
+<details>
+<summary><h2>Entrega 04 ✅ — 18/05/2026</h2></summary>
+
+### Histórias Implementadas (Sprint 2)
+Foram selecionadas as últimas histórias presentes no backlog; 5 no total:
+1. Criar orçamentos mensais a partir de categorias
+2. Adicionar investimentos
+3. Acompanhar investimentos
+4. Visualizar fluxo de caixa em gráfico
+5. Registrar gastos fixos recorrentes
+
+### Screencast com as histórias implementadas
+
+[Assistir no Youtube](#) 
+
+#### Screencast testando as histórias implementadas via testes E2E:
+
+[Assistir](#)
+
+#### Screencast mostrando o processo de build CI/CD:
+[Assistir](#)
+
+### JIRA - Sprint 03
+![Quadro da sprint 03](#)
+
+### Issues/Bug tracker (GitHub)
+Adicionamos mais bugs e mais sugestões de melhorias para o projeto:
+#### Milestone da Sprint 3:
+![Milestone sprint 3](docs/imgs/milestone_sprint3.png)
+
+#### Issues fechadas:
+Conseguimos resolver a grande maioria das sugestões e bugs que encontramos no sistema:
+![Issues fechadas](docs/imgs/closed_issues_4.png)
+
+#### Issues em aberto:
+Ao final da entrega, algumas Issues ainda permaneceram, mas estas em sua maioria são sugestões de melhorias para a aplicação.
+![Issues em aberto restantes](docs/imgs/open_issues_4.png)
+
+
+### Programação em par (atualização)
+Nesta entrega, optamos por não utilizar a programação em par como nas outras entregas. Os desenvolvedores realizaram as atividades designadas e os demais membros se disponibilizaram para ajudar a cada um caso estivesse com dificuldades. Também foram designadas pessoas para fazer uma revisão de código antes de fazer merge nos Pull Requests para verificar se tudo estava de acordo com os parâmetros. Todos contribuiram para esta última entrega.
+
+
+</details>
 
 
 ---
