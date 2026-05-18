@@ -27,6 +27,8 @@ def validate_transaction_data(form_data, user, get_categories_func):
             conta = Conta.objects.filter(usuario=user).get(pk=form_data['conta_id'])
         except Conta.DoesNotExist:
             errors['conta_id'] = 'Selecione uma conta bancária válida.'
+    else:
+        errors['conta_id'] = 'Selecione uma conta bancária.'
 
     raw_value = form_data.get('value', '').replace(',', '.')
     try:

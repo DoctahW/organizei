@@ -54,9 +54,7 @@ class Transaction(models.Model):
     )
     conta = models.ForeignKey(
         'bank_accounts.Conta',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
         verbose_name="Conta Bancária",
     )
     date = models.DateField(default=timezone.now, verbose_name="Data")

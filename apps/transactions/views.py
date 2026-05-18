@@ -185,6 +185,9 @@ def edit_transaction(request, pk):
             'date': request.POST.get('date', '').strip(),
             'is_fixed': request.POST.get('is_fixed', 'off'),
         }
+        if is_subscription and not form_data.get('conta_id'):
+            if transaction.conta:
+                form_data['conta_id'] = str(transaction.conta.pk)
         errors, parsed_value, category, conta = validate_transaction_data(
             form_data, request.user, _get_categories_for_user
         )

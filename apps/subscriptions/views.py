@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Subscription
 from apps.transactions.models import Transaction, Category
+from apps.bank_accounts.models import Conta
 
 
 def _get_subscription_category():
@@ -33,7 +34,7 @@ def _generate_subscription_occurrences(subscription):
     return occurrences
 
 
-def _create_transactions_for_subscription(subscription, user):
+def _create_transactions_for_subscription(subscription, user, conta):
     category = _get_subscription_category()
     occurrences = _generate_subscription_occurrences(subscription)
 
@@ -44,6 +45,7 @@ def _create_transactions_for_subscription(subscription, user):
             transaction_type='WITHDRAWAL',
             value=subscription.value,
             category=category,
+            conta=conta,
             subscription=subscription,
             date=vencimento,
             is_fixed=True,
@@ -60,6 +62,7 @@ def manage_subscriptions(request):
         value = request.POST.get('value').replace('R$', '').replace('.', '').replace(',', '.').strip()
         start_date_raw = request.POST.get('start_date')
         end_date_raw = request.POST.get('end_date') or None
+        conta_id = request.POST.get('conta_id', '').strip()
 
         start_date_input = (
             datetime.strptime(start_date_raw, '%Y-%m-%d').date()
@@ -70,15 +73,23 @@ def manage_subscriptions(request):
             if end_date_raw else None
         )
 
+        conta = None
+        if conta_id:
+            try:
+                conta = Conta.objects.filter(usuario=request.user).get(pk=conta_id)
+            except Conta.DoesNotExist:
+                pass
+
         subscription = Subscription.objects.create(
             user=request.user,
             name=name,
             value=value,
             start_date=start_date_input,
             end_date=end_date_input,
+            conta=conta,
         )
 
-        _create_transactions_for_subscription(subscription, request.user)
+        _create_transactions_for_subscription(subscription, request.user, conta)
 
         return redirect('subscriptions:manage_subscriptions')
 
@@ -100,12 +111,14 @@ def manage_subscriptions(request):
         total_a_pagar=DSum('value', filter=Q(date__gt=today)),
     )
 
+    contas = Conta.objects.filter(usuario=request.user)
     context = {
         'subscriptions': subs,
         'total_geral': totals['total_geral'] or 0,
         'total_pago': totals['total_pago'] or 0,
         'total_a_pagar': totals['total_a_pagar'] or 0,
         'hoje': today,
+        'contas': contas,
     }
     return render(request, 'subscriptions/manage_subscriptions.html', context)
 

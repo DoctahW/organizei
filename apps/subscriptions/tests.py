@@ -8,6 +8,7 @@ from django.urls import reverse
 from apps.subscriptions.models import Subscription
 from apps.subscriptions.views import _generate_subscription_occurrences, _create_transactions_for_subscription
 from apps.transactions.models import Transaction, Category
+from apps.bank_accounts.models import Conta, Bank
 
 
 def make_user(username='testuser'):
@@ -19,13 +20,21 @@ def make_category():
     return cat
 
 
-def make_subscription(user, name='Netflix', value='29.90', start_date=None, end_date=None):
+def make_conta(user):
+    bank = Bank.objects.create(name="Test Bank")
+    return Conta.objects.create(bank=bank, usuario=user, account_type="corrente", number="12345")
+
+
+def make_subscription(user, name='Netflix', value='29.90', start_date=None, end_date=None, conta=None):
+    if conta is None:
+        conta = make_conta(user)
     return Subscription.objects.create(
         user=user,
         name=name,
         value=value,
         start_date=start_date or date.today(),
         end_date=end_date,
+        conta=conta,
     )
 
 class GenerateOccurrencesTest(TestCase):
@@ -81,39 +90,40 @@ class CreateTransactionsForSubscriptionTest(TestCase):
     def setUp(self):
         self.user = make_user()
         self.category = make_category()
+        self.conta = make_conta(self.user)
 
     def test_creates_correct_number_of_transactions(self):
-        sub = make_subscription(self.user, start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(sub, self.user)
+        sub = make_subscription(self.user, start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(sub, self.user, self.conta)
         self.assertEqual(Transaction.objects.filter(subscription=sub).count(), 12)
 
     def test_transactions_are_withdrawals(self):
-        sub = make_subscription(self.user, start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(sub, self.user)
+        sub = make_subscription(self.user, start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(sub, self.user, self.conta)
         types = Transaction.objects.filter(subscription=sub).values_list('transaction_type', flat=True)
         self.assertTrue(all(t == 'WITHDRAWAL' for t in types))
 
     def test_transactions_have_assinatura_category(self):
-        sub = make_subscription(self.user, start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(sub, self.user)
+        sub = make_subscription(self.user, start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(sub, self.user, self.conta)
         categories = Transaction.objects.filter(subscription=sub).values_list('category__name', flat=True)
         self.assertTrue(all(c == 'Assinatura' for c in categories))
 
     def test_transactions_have_correct_value(self):
-        sub = make_subscription(self.user, value='55.90', start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(sub, self.user)
+        sub = make_subscription(self.user, value='55.90', start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(sub, self.user, self.conta)
         values = Transaction.objects.filter(subscription=sub).values_list('value', flat=True)
         self.assertTrue(all(float(v) == 55.90 for v in values))
 
     def test_transactions_linked_to_subscription(self):
-        sub = make_subscription(self.user, start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(sub, self.user)
+        sub = make_subscription(self.user, start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(sub, self.user, self.conta)
         linked = Transaction.objects.filter(subscription=sub).count()
         self.assertEqual(linked, 12)
 
     def test_transactions_marked_as_fixed(self):
-        sub = make_subscription(self.user, start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(sub, self.user)
+        sub = make_subscription(self.user, start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(sub, self.user, self.conta)
         fixed = Transaction.objects.filter(subscription=sub, is_fixed=True).count()
         self.assertEqual(fixed, 12)
 
@@ -125,6 +135,7 @@ class ManageSubscriptionsViewTest(TestCase):
         self.client = Client()
         self.client.login(username='testuser', password='testpass')
         self.category = make_category()
+        self.conta = make_conta(self.user)
         self.url = reverse('subscriptions:manage_subscriptions')
 
     def test_get_returns_200(self):
@@ -136,6 +147,7 @@ class ManageSubscriptionsViewTest(TestCase):
             'name': 'Spotify',
             'value': '21,90',
             'start_date': '2026-01-01',
+            'conta_id': str(self.conta.pk),
         })
         self.assertEqual(Subscription.objects.filter(user=self.user, name='Spotify').count(), 1)
 
@@ -144,6 +156,7 @@ class ManageSubscriptionsViewTest(TestCase):
             'name': 'Spotify',
             'value': '21,90',
             'start_date': '2026-01-01',
+            'conta_id': str(self.conta.pk),
         })
         sub = Subscription.objects.get(user=self.user, name='Spotify')
         self.assertEqual(Transaction.objects.filter(subscription=sub).count(), 12)
@@ -153,6 +166,7 @@ class ManageSubscriptionsViewTest(TestCase):
             'name': 'Disney+',
             'value': '38,90',
             'start_date': '2026-01-01',
+            'conta_id': str(self.conta.pk),
         })
         self.assertRedirects(response, self.url)
 
@@ -170,8 +184,9 @@ class DeleteSubscriptionViewTest(TestCase):
         self.client = Client()
         self.client.login(username='testuser', password='testpass')
         self.category = make_category()
-        self.sub = make_subscription(self.user, start_date=date(2026, 1, 1))
-        _create_transactions_for_subscription(self.sub, self.user)
+        self.conta = make_conta(self.user)
+        self.sub = make_subscription(self.user, start_date=date(2026, 1, 1), conta=self.conta)
+        _create_transactions_for_subscription(self.sub, self.user, self.conta)
 
     def test_delete_removes_subscription(self):
         url = reverse('subscriptions:delete_subscription', args=[self.sub.pk])
