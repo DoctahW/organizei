@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import F, Sum, Q, Value
+from django.db.models import Sum, Q, Value
 from django.db.models.functions import Coalesce
 
 

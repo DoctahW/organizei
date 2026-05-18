@@ -3,7 +3,6 @@ from decimal import Decimal, InvalidOperation
 
 import requests
 
-from .models import Investment
 
 BRAPI_URL = "https://brapi.dev/api/quote/{ticker}"
 BRAPI_TIMEOUT = 5
