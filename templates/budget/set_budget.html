@@ -37,7 +37,7 @@
               <p>{{ category.name }}</p>
            </div>
           {% endfor %}
-          <a id="new-category-btn" class="button-glass" href="{% url 'transactions:create_category' %}">
+          <a id="new-category-btn" class="button-glass" href="{% url 'transactions:create_category' %}?next=budget">
               <p>Adicionar Nova Categoria</p>
           </a>
       </section>

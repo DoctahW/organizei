@@ -82,20 +82,21 @@ function openCategoryModal() {
 
 }
 
-function selectCategory(categoryValue, categoryLabel) {
+function selectCategory(categoryValue, categoryName) { 
+
     if (modal) {
         modal.style.display = 'none';
-        pageTitle.textContent = 'Criar Transação';
-        categoryBtnContainer ? categoryBtnContainer.style.display = 'flex' : null;
-        valueContainer ? valueContainer.style.display = 'flex' : null;
-        nameInput ? nameInput.style.display = 'flex' : null;
-        transactionTypeSelect ? transactionTypeSelect.style.display = 'block' : null;
-        sentTransactionBtn ? sentTransactionBtn.style.display = 'block' : null;
-        addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
-        dateContainer ? dateContainer.style.display = 'flex' : null;
-        recurringContainer ? recurringContainer.style.display = 'block' : null;
-        contaSelect ? contaSelect.style.display = 'block' : null;
-        categoryLabel ? categoryLabel.style.display = 'block' : null;
+        if (typeof pageTitle !== 'undefined' && pageTitle) pageTitle.textContent = 'Criar Transação';
+        
+        if (typeof categoryBtnContainer !== 'undefined' && categoryBtnContainer) categoryBtnContainer.style.display = 'flex';
+        if (typeof valueContainer !== 'undefined' && valueContainer) valueContainer.style.display = 'flex';
+        if (typeof nameInput !== 'undefined' && nameInput) nameInput.style.display = 'flex';
+        if (typeof transactionTypeSelect !== 'undefined' && transactionTypeSelect) transactionTypeSelect.style.display = 'block';
+        if (typeof sentTransactionBtn !== 'undefined' && sentTransactionBtn) sentTransactionBtn.style.display = 'block';
+        if (typeof addNewCategoryContainer !== 'undefined' && addNewCategoryContainer) addNewCategoryContainer.style.display = 'none';
+        if (typeof dateContainer !== 'undefined' && dateContainer) dateContainer.style.display = 'flex';
+        if (typeof recurringContainer !== 'undefined' && recurringContainer) recurringContainer.style.display = 'block';
+        if (typeof contaSelect !== 'undefined' && contaSelect) contaSelect.style.display = 'block';
     }
 
     const hiddenCategoryInput = document.getElementById('selected-category');
@@ -103,9 +104,9 @@ function selectCategory(categoryValue, categoryLabel) {
         hiddenCategoryInput.value = categoryValue;
     }
 
-    const categoryBtn = document.getElementById('category-btn');
-    if (categoryBtn) {
-        categoryBtn.innerHTML = `<p>${categoryLabel}</p><span class="edit-icon">></span>`;
+    const btnText = document.getElementById('category-btn')?.querySelector('p');
+    if (btnText && categoryName) {
+        btnText.innerText = categoryName;
     }
 }
 

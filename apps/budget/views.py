@@ -10,7 +10,7 @@ from .services import validate_budget_data
 @login_required
 def set_budget(request):
     errors = {}
-    categories = Category.objects.filter(Q(user=request.user) | Q(user__isnull=True))
+    categories = Category.objects.filter(Q(user=request.user) | Q(user__isnull=True)).exclude(name__icontains='salário')
 
     if request.method == 'POST':
         data = {"limit": request.POST.get('limit')}
