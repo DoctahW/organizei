@@ -206,7 +206,7 @@ Foram selecionadas as últimas histórias presentes no backlog; 5 no total:
 [Assistir](#)
 
 ### JIRA - Sprint 03
-![Quadro da sprint 03](#)
+<img width="904" height="440" alt="image" src="https://github.com/user-attachments/assets/902d912c-8a09-43b2-9d47-9853d656d9a2" />
 
 ### Issues/Bug tracker (GitHub)
 Adicionamos mais bugs e mais sugestões de melhorias para o projeto:
@@ -215,11 +215,13 @@ Adicionamos mais bugs e mais sugestões de melhorias para o projeto:
 
 #### Issues fechadas:
 Conseguimos resolver a grande maioria das sugestões e bugs que encontramos no sistema:
-![Issues fechadas](docs/imgs/closed_issues_4.png)
+
+<img width="1009" height="554" alt="image" src="https://github.com/user-attachments/assets/96274566-ce31-4144-be08-8a901c894f95" />
 
 #### Issues em aberto:
 Ao final da entrega, algumas Issues ainda permaneceram, mas estas em sua maioria são sugestões de melhorias para a aplicação.
-![Issues em aberto restantes](docs/imgs/open_issues_4.png)
+
+<img width="1115" height="431" alt="image" src="https://github.com/user-attachments/assets/4b6c2061-bb94-4042-b5c2-8550cacf6ce2" />
 
 ### `CONTRIBUTING.md`
 Criado arquivo explicando como pode-se contribuir com o projeto:
