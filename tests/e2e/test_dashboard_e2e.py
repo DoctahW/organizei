@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from apps.budget.models import Budget
 from apps.goals.models import Goal
 from apps.transactions.models import Transaction
+from apps.bank_accounts.models import Conta, Bank
 
 from .base import E2EBaseTest
 
@@ -16,6 +17,8 @@ class DashboardE2ETest(E2EBaseTest):
     def setUp(self):
         self.user = self.create_user()
         self.login_via_ui()
+        self.bank = Bank.objects.create(name="Test Bank")
+        self.conta = Conta.objects.create(bank=self.bank, usuario=self.user, account_type="corrente", number="12345")
 
     def test_empty_dashboard_shows_ctas(self):
         """A user with no data sees the empty-state CTA on the dashboard."""
@@ -35,6 +38,7 @@ class DashboardE2ETest(E2EBaseTest):
             value=3000,
             transaction_type="DEPOSIT",
             date=date.today(),
+            conta=self.conta,
         )
         Goal.objects.create(
             user=self.user,
@@ -64,6 +68,7 @@ class DashboardE2ETest(E2EBaseTest):
             value=600,
             transaction_type="WITHDRAWAL",
             date=today,
+            conta=self.conta,
         )
 
         self.goto("dashboard:home")

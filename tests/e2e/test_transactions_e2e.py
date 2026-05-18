@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
 from .base import E2EBaseTest
+from apps.bank_accounts.models import Conta, Bank
 
 
 @tag("e2e")
@@ -11,6 +12,8 @@ class TransactionsE2ETest(E2EBaseTest):
     def setUp(self):
         self.user = self.create_user()
         self.login_via_ui()
+        self.bank = Bank.objects.create(name="Test Bank")
+        self.conta = Conta.objects.create(bank=self.bank, usuario=self.user, account_type="corrente", number="12345")
 
     def _fill_transaction_form(self, tx_type, name, value):
         self.goto("transactions:create_transaction")
@@ -28,6 +31,10 @@ class TransactionsE2ETest(E2EBaseTest):
         self.driver.execute_script(
             "document.getElementById('selected-category').value = '';"
         )
+        # Select conta
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=conta_id]")
+        ).select_by_value(str(self.conta.id))
         create_url = self.driver.current_url
         self.driver.find_element(By.ID, "sent-transaction-btn").click()
         # Wait for redirect away from the create page
@@ -60,6 +67,10 @@ class TransactionsE2ETest(E2EBaseTest):
         self.driver.execute_script(
             "document.getElementById('selected-category').value = '';"
         )
+        # Select conta
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=conta_id]")
+        ).select_by_value(str(self.conta.id))
         value_input = self.driver.find_element(By.ID, "value-input")
         value_input.clear()
         value_input.send_keys("50.00")
@@ -87,6 +98,10 @@ class TransactionsE2ETest(E2EBaseTest):
         self.driver.execute_script(
             "document.getElementById('selected-category').value = '';"
         )
+        # Select conta
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=conta_id]")
+        ).select_by_value(str(self.conta.id))
         
         value_input = self.driver.find_element(By.ID, "value-input")
         value_input.clear()
@@ -125,6 +140,10 @@ class TransactionsE2ETest(E2EBaseTest):
         self.driver.execute_script(
             "document.getElementById('selected-category').value = '';"
         )
+        # Select conta
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=conta_id]")
+        ).select_by_value(str(self.conta.id))
 
         self.driver.execute_script(
             "document.getElementById('value-input').value = '100.00';"
@@ -151,6 +170,7 @@ class TransactionsE2ETest(E2EBaseTest):
             name="Test Transaction",
             transaction_type="WITHDRAWAL",
             value=100.00,
+            conta=self.conta,
         )
 
         # Navigate directly to edit page using URL reverse
@@ -199,6 +219,10 @@ class TransactionsE2ETest(E2EBaseTest):
         self.driver.execute_script(
             "document.getElementById('value-input').value = '100.00';"
         )
+        # Select conta
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=conta_id]")
+        ).select_by_value(str(self.conta.id))
 
         # Verify date and launch type are visible before opening modal
         date_container = self.driver.find_element(By.CLASS_NAME, "choose-date-container")
@@ -236,6 +260,10 @@ class TransactionsE2ETest(E2EBaseTest):
         self.driver.execute_script(
             "document.getElementById('value-input').value = '100.00';"
         )
+        # Select conta
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=conta_id]")
+        ).select_by_value(str(self.conta.id))
 
         # Get containers
         date_container = self.driver.find_element(By.CLASS_NAME, "choose-date-container")
