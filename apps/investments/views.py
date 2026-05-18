@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from django.http import JsonResponse
 
@@ -48,9 +49,18 @@ def investment_list(request):
     })
 
 
+def _resolve_next(request):
+    candidate = request.POST.get("next") or request.GET.get("next") or ""
+    if candidate and url_has_allowed_host_and_scheme(
+        candidate, allowed_hosts={request.get_host()}
+    ):
+        return candidate
+    return None
+
+
 @login_required
 def investment_register(request):
-    return render(request, "investments/register.html")
+    return render(request, "investments/register.html", {"next": _resolve_next(request) or ""})
 
 
 @login_required
@@ -89,9 +99,10 @@ def investment_create_manual(request):
                 )
                 investimento.recalc()
             messages.success(request, f'Investimento "{investimento.nome}" cadastrado.')
-            return redirect("investments:list")
+            next_url = _resolve_next(request)
+            return redirect(next_url) if next_url else redirect("investments:list")
 
-    return render(request, "investments/register_manual.html", {"errors": errors, "data": data})
+    return render(request, "investments/register_manual.html", {"errors": errors, "data": data, "next": _resolve_next(request) or ""})
 
 
 @login_required
@@ -140,9 +151,10 @@ def investment_create_auto(request):
                     request,
                     f"{investimento.ticker} cadastrado (cotação atual R$ {price}).",
                 )
-                return redirect("investments:list")
+                next_url = _resolve_next(request)
+                return redirect(next_url) if next_url else redirect("investments:list")
 
-    return render(request, "investments/register_auto.html", {"errors": errors, "data": data})
+    return render(request, "investments/register_auto.html", {"errors": errors, "data": data, "next": _resolve_next(request) or ""})
 
 
 @login_required
@@ -217,7 +229,8 @@ def investment_create_tesouro(request):
                     f"{investimento.nome} cadastrado: {quantidade} títulos "
                     f"comprados a R$ {pu_compra} cada (PU atual R$ {pu_atual}).",
                 )
-                return redirect("investments:list")
+                next_url = _resolve_next(request)
+                return redirect(next_url) if next_url else redirect("investments:list")
 
     return render(
         request,
@@ -227,6 +240,7 @@ def investment_create_tesouro(request):
             "data": data,
             "tipos": tipos,
             "titulos_dict": titulos_dict,
+            "next": _resolve_next(request) or "",
         },
     )
 

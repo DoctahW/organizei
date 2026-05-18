@@ -20,5 +20,6 @@ urlpatterns = [
     path("subscriptions/", include("apps.subscriptions.urls")),
     path("budget/", include("apps.budget.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
-    path("my_accounts/",include("apps.bank_accounts.urls"))
+    path("my_accounts/",include("apps.bank_accounts.urls")),
+    path("onboarding/", include("apps.onboarding.urls")),
 ]

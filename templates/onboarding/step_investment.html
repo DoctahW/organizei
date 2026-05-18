@@ -1,0 +1,29 @@
+{% extends "onboarding/_layout.html" %}
+
+{% block title %}Investimentos — Organizei{% endblock %}
+
+{% block onboarding_title %}Tem algum investimento?{% endblock %}
+{% block onboarding_subtitle %}Escolha como deseja cadastrar - cada tipo de investimento tem informações próprias. Você pode pular e adicionar depois.{% endblock %}
+
+{% block onboarding_body %}
+<div class="onboarding-options">
+  <a href="{% url 'onboarding:step_investment_auto' %}" class="onboarding-option glass">
+    <span class="onboarding-option__title">Ações & FIIs</span>
+    <span class="onboarding-option__desc">Para ativos da B3 (PETR4, HGLG11, cripto). Informe o ticker e buscamos a cotação automaticamente.</span>
+  </a>
+  <a href="{% url 'onboarding:step_investment_tesouro' %}" class="onboarding-option glass">
+    <span class="onboarding-option__title">Tesouro Direto</span>
+    <span class="onboarding-option__desc">Escolha o título numa lista oficial atualizada diariamente pelo Tesouro Nacional.</span>
+  </a>
+  <a href="{% url 'onboarding:step_investment_manual' %}" class="onboarding-option glass">
+    <span class="onboarding-option__title">Manual</span>
+    <span class="onboarding-option__desc">Para fundos e outros ativos sem cotação pública. Informe valor aplicado e valor atual.</span>
+  </a>
+</div>
+
+<div class="onboarding-actions onboarding-actions--split">
+  <a href="{% url 'onboarding:step_subscription' %}" class="button-glass onboarding-action-skip">Pular</a>
+  <a href="{% url 'onboarding:step_subscription' %}" class="button-glass button-glass--active onboarding-action-primary">Continuar</a>
+</div>
+<a href="{% url 'onboarding:finish' %}" class="onboarding-finish-link">Ir direto para o dashboard</a>
+{% endblock %}

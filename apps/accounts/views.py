@@ -104,7 +104,7 @@ def _handle_register(request, context):
         return render(request, "registration/login.html", context)
 
     login(request, user)
-    return redirect("/dashboard/")
+    return redirect("onboarding:start")
 
 
 @require_POST

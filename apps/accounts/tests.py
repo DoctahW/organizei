@@ -39,7 +39,7 @@ class AuthViewTests(TestCase):
                 "confirm_password": "newpass123",
             },
         )
-        self.assertRedirects(response, "/dashboard/", fetch_redirect_response=False)
+        self.assertRedirects(response, "/onboarding/", fetch_redirect_response=False)
         self.assertTrue(User.objects.filter(username="new@example.com").exists())
         user = User.objects.get(username="new@example.com")
         self.assertEqual(user.first_name, "New User")

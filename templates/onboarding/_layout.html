@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/onboarding/onboarding.css' %}">
+{% block onboarding_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block tab_bar %}{% endblock %}
+
+{% block content %}
+<main class="onboarding-wrapper">
+  <div class="onboarding-card glass">
+    <header class="onboarding-header">
+      <span class="onboarding-brand">Organizei</span>
+      <div class="onboarding-progress" aria-label="Etapa {{ step_index }} de {{ step_total }}">
+        {% for i in "1234" %}
+          {% if forloop.counter <= step_index %}
+            <span class="onboarding-progress__dot onboarding-progress__dot--filled"></span>
+          {% else %}
+            <span class="onboarding-progress__dot"></span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </header>
+
+    <section class="onboarding-headline">
+      <h1 class="onboarding-title">{% block onboarding_title %}{% endblock %}</h1>
+      <p class="onboarding-subtitle">{% block onboarding_subtitle %}{% endblock %}</p>
+    </section>
+
+    <div class="onboarding-body">
+      {% block onboarding_body %}{% endblock %}
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}{% block onboarding_extra_js %}{% endblock %}{% endblock %}

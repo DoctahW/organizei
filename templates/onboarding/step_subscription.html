@@ -1,0 +1,50 @@
+{% extends "onboarding/_layout.html" %}
+
+{% block title %}Assinaturas — Organizei{% endblock %}
+
+{% block onboarding_title %}Adicione uma assinatura recorrente{% endblock %}
+{% block onboarding_subtitle %}Streaming, academia, software… o Organizei cria 12 lançamentos mensais automaticamente. Pular agora não cancela nada.{% endblock %}
+
+{% block onboarding_body %}
+<form method="post" class="onboarding-form">
+  {% csrf_token %}
+
+  <label class="onboarding-field">
+    <span>Nome</span>
+    <input class="input-box" type="text" name="name" placeholder="Ex.: Netflix" value="{{ form_data.name|default:'' }}" required>
+    {% if errors.name %}<span class="field-error">{{ errors.name }}</span>{% endif %}
+  </label>
+
+  <div class="onboarding-grid">
+    <label class="onboarding-field">
+      <span>Valor (R$)</span>
+      <input class="input-box" type="text" inputmode="decimal" name="value" placeholder="Ex.: 39,90" value="{{ form_data.value|default:'' }}" required>
+      {% if errors.value %}<span class="field-error">{{ errors.value }}</span>{% endif %}
+    </label>
+
+    <label class="onboarding-field">
+      <span>Data de início</span>
+      <input class="input-box" type="date" name="start_date" value="{{ form_data.start_date|default:'' }}" required>
+      {% if errors.start_date %}<span class="field-error">{{ errors.start_date }}</span>{% endif %}
+    </label>
+  </div>
+
+  <label class="onboarding-field">
+    <span>Conta de cobrança</span>
+    <select name="conta_id" required class="input-box">
+      <option value="">Selecione a conta</option>
+      {% for conta in contas %}
+      <option value="{{ conta.id }}" {% if form_data.conta_id == conta.id|stringformat:"s" %}selected{% endif %}>
+        {{ conta.nickname|default:conta.bank.name }}
+      </option>
+      {% endfor %}
+    </select>
+    {% if errors.conta_id %}<span class="field-error">{{ errors.conta_id }}</span>{% endif %}
+  </label>
+
+  <div class="onboarding-actions onboarding-actions--split">
+    <a href="{% url 'onboarding:finish' %}" class="button-glass onboarding-action-skip">Pular</a>
+    <button type="submit" class="button-glass button-glass--active onboarding-action-primary">Concluir</button>
+  </div>
+</form>
+{% endblock %}

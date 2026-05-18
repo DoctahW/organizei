@@ -1,0 +1,100 @@
+{% extends "onboarding/_layout.html" %}
+
+{% block title %}Tesouro Direto — Organizei{% endblock %}
+
+{% block onboarding_title %}Tesouro Direto{% endblock %}
+{% block onboarding_subtitle %}Lista oficial sincronizada diariamente com o Tesouro Transparente. Escolha o título e a data da compra.{% endblock %}
+
+{% block onboarding_body %}
+<form method="post" class="onboarding-form">
+  {% csrf_token %}
+
+  <label class="onboarding-field">
+    <span>Tipo de título</span>
+    <select name="tipo_tesouro" id="id_tipo_tesouro" class="input-box" required>
+      <option value="">Selecione</option>
+      {% for tipo in tipos %}
+      <option value="{{ tipo }}" {% if data.tipo_tesouro == tipo %}selected{% endif %}>{{ tipo }}</option>
+      {% endfor %}
+    </select>
+    {% if errors.tipo_tesouro %}<span class="field-error">{{ errors.tipo_tesouro }}</span>{% endif %}
+  </label>
+
+  <label class="onboarding-field">
+    <span>Vencimento</span>
+    <select name="vencimento" id="id_vencimento" class="input-box" required disabled>
+      <option value="">Selecione o tipo primeiro</option>
+    </select>
+    <small id="titulo_info" style="color: var(--text-muted); font-size: 12px;"></small>
+    {% if errors.vencimento %}<span class="field-error">{{ errors.vencimento }}</span>{% endif %}
+  </label>
+
+  <div class="onboarding-grid">
+    <label class="onboarding-field">
+      <span>Valor investido (R$)</span>
+      <input class="input-box" type="number" step="0.01" min="0" name="valor_aplicado" placeholder="Ex.: 500,00" value="{{ data.valor_aplicado|default:'' }}" required>
+      {% if errors.valor_aplicado %}<span class="field-error">{{ errors.valor_aplicado }}</span>{% endif %}
+    </label>
+
+    <label class="onboarding-field">
+      <span>Data da compra</span>
+      <input class="input-box" type="date" name="data_aplicacao" value="{{ data.data_aplicacao|default:'' }}" required>
+      {% if errors.data_aplicacao %}<span class="field-error">{{ errors.data_aplicacao }}</span>{% endif %}
+    </label>
+  </div>
+
+  <div class="onboarding-actions onboarding-actions--split">
+    <a href="{% url 'onboarding:step_investment' %}" class="button-glass onboarding-action-skip">Voltar</a>
+    <button type="submit" class="button-glass button-glass--active onboarding-action-primary">Cadastrar e buscar PU</button>
+  </div>
+  <a href="{% url 'onboarding:finish' %}" class="onboarding-finish-link">Ir direto para o dashboard</a>
+</form>
+
+{{ titulos_dict|json_script:"titulos-data" }}
+{% endblock %}
+
+{% block onboarding_extra_js %}
+<script>
+(function () {
+  const titulos = JSON.parse(document.getElementById("titulos-data").textContent);
+  const tipoSelect = document.getElementById("id_tipo_tesouro");
+  const vencSelect = document.getElementById("id_vencimento");
+  const info = document.getElementById("titulo_info");
+  const initialVenc = "{{ data.vencimento|default:'' }}";
+
+  function popularVencimentos() {
+    const tipo = tipoSelect.value;
+    vencSelect.innerHTML = "";
+    info.textContent = "";
+
+    if (!tipo || !titulos[tipo]) {
+      vencSelect.disabled = true;
+      vencSelect.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+      return;
+    }
+
+    vencSelect.disabled = false;
+    vencSelect.appendChild(new Option("Selecione o vencimento", ""));
+    titulos[tipo].forEach(function (t) {
+      const label = t.vencimento_br + " · PU R$ " + t.pu_compra + " · taxa " + t.taxa_compra + "%";
+      const opt = new Option(label, t.vencimento);
+      if (t.vencimento === initialVenc) opt.selected = true;
+      vencSelect.appendChild(opt);
+    });
+    atualizarInfo();
+  }
+
+  function atualizarInfo() {
+    const tipo = tipoSelect.value;
+    const venc = vencSelect.value;
+    if (!tipo || !venc) { info.textContent = ""; return; }
+    const t = (titulos[tipo] || []).find(function (x) { return x.vencimento === venc; });
+    if (t) info.textContent = "PU atual: R$ " + t.pu_compra + " (taxa " + t.taxa_compra + "%)";
+  }
+
+  tipoSelect.addEventListener("change", popularVencimentos);
+  vencSelect.addEventListener("change", atualizarInfo);
+  if (tipoSelect.value) popularVencimentos();
+})();
+</script>
+{% endblock %}
