@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Novo Investimento — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/investments/investments.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content investments-register-page">
+  <div class="register-container">
+    <div class="page-title-row">
+      <a href="{% url 'investments:list' %}" class="back-link" aria-label="Voltar">&#8249;</a>
+      <h1 class="register-title">Novo Investimento</h1>
+    </div>
+
+    <div class="register-card glass">
+      <h2 class="register-subtitle">Como deseja cadastrar?</h2>
+      <p class="register-lede">
+        Escolha o tipo de ativo. Ações, FIIs e Tesouro Direto têm cotação
+        atualizada automaticamente — fundos e demais ativos entram em modo manual.
+      </p>
+
+      <div class="register-grid">
+        <a href="{% url 'investments:create_auto' %}" class="register-card-option">
+          <span class="register-card-option__title">Ações &amp; FIIs</span>
+          <span class="register-card-option__text">
+            Para ações, FIIs e criptos da B3. Informe ticker e quantidade —
+            buscamos a cotação atual na BRAPI e calculamos seu rendimento.
+          </span>
+        </a>
+
+        <a href="{% url 'investments:create_tesouro' %}" class="register-card-option">
+          <span class="register-card-option__title">Tesouro Direto</span>
+          <span class="register-card-option__text">
+            Tesouro Selic, Prefixado, IPCA+, Renda+ e Educa+. Escolha o título
+            numa lista oficial atualizada diariamente pelo Tesouro Nacional.
+          </span>
+        </a>
+
+        <a href="{% url 'investments:create_manual' %}" class="register-card-option">
+          <span class="register-card-option__title">Manual</span>
+          <span class="register-card-option__text">
+            Para fundos e outros ativos sem cotação pública. Você informa o
+            valor aplicado e o valor atual — sem consulta automática.
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

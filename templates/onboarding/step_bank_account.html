@@ -1,0 +1,58 @@
+{% extends "onboarding/_layout.html" %}
+
+{% block title %}Bem-vindo — Organizei{% endblock %}
+
+{% block onboarding_title %}Crie sua primeira conta bancária{% endblock %}
+{% block onboarding_subtitle %}Toda transação no Organizei é vinculada a uma conta. Vamos começar por aqui - leva menos de um minuto.{% endblock %}
+
+{% block onboarding_body %}
+<form method="post" class="onboarding-form">
+  {% csrf_token %}
+
+  <fieldset class="onboarding-fieldset">
+    <legend class="onboarding-legend">Tipo da conta</legend>
+    <div class="onboarding-type-selector">
+      <label class="onboarding-chip">
+        <input type="radio" name="account_type" value="corrente" {% if account_type == "corrente" or not account_type %}checked{% endif %}>
+        <span>Conta Corrente</span>
+      </label>
+      <label class="onboarding-chip">
+        <input type="radio" name="account_type" value="poupanca" {% if account_type == "poupanca" %}checked{% endif %}>
+        <span>Poupança</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="onboarding-grid">
+    <label class="onboarding-field">
+      <span>Banco</span>
+      <input class="input-box" type="text" name="bank" placeholder="Ex.: Nubank" value="{{ form_data.bank|default:'' }}" required>
+    </label>
+
+    <label class="onboarding-field">
+      <span>Agência</span>
+      <input class="input-box" type="text" name="agency" placeholder="Ex.: 0001" value="{{ form_data.agency|default:'' }}">
+    </label>
+
+    <label class="onboarding-field onboarding-field--full">
+      <span>Apelido da Conta</span>
+      <input class="input-box" type="text" name="nickname" placeholder="Ex.: Conta do dia a dia" value="{{ form_data.nickname|default:'' }}">
+    </label>
+
+    <label class="onboarding-field onboarding-field--full">
+      <span>Número da Conta</span>
+      <input class="input-box" type="text" name="number" placeholder="Digite o número da conta" value="{{ form_data.number|default:'' }}" required>
+    </label>
+  </div>
+
+  {% if errors %}
+  <ul class="onboarding-errors">
+    {% for error in errors.values %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="onboarding-actions">
+    <button type="submit" class="button-glass button-glass--active onboarding-action-primary">Adicionar conta</button>
+  </div>
+</form>
+{% endblock %}

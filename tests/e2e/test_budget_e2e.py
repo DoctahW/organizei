@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 from apps.transactions.models import Transaction
+from apps.bank_accounts.models import Conta, Bank
 
 from .base import E2EBaseTest
 
@@ -14,6 +15,8 @@ class BudgetE2ETest(E2EBaseTest):
     def setUp(self):
         self.user = self.create_user()
         self.login_via_ui()
+        self.bank = Bank.objects.create(name="Test Bank")
+        self.conta = Conta.objects.create(bank=self.bank, usuario=self.user, account_type="corrente", number="12345")
 
     def _set_budget_via_ui(self, limit_value):
         self.goto("budget:set_budget")
@@ -32,6 +35,7 @@ class BudgetE2ETest(E2EBaseTest):
             value=amount,
             transaction_type="WITHDRAWAL",
             date=date.today(),
+            conta=self.conta,
         )
 
     def test_define_limit_and_see_percentage(self):

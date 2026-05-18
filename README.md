@@ -181,6 +181,58 @@ Algumas dessas issues inclui a melhora de alguma funcionalidade do sistema e alg
 
 </details>
 
+---
+
+<details>
+<summary><h2>Entrega 04 ✅ — 18/05/2026</h2></summary>
+
+### Histórias Implementadas (Sprint 2)
+Foram selecionadas as últimas histórias presentes no backlog; 5 no total:
+1. Criar orçamentos mensais a partir de categorias
+2. Adicionar investimentos
+3. Acompanhar investimentos
+4. Visualizar fluxo de caixa em gráfico
+5. Registrar gastos fixos recorrentes
+
+### Screencast com as histórias implementadas
+
+[Assistir no Youtube](#) 
+
+#### Screencast testando as histórias implementadas via testes E2E:
+
+[Assistir](#)
+
+#### Screencast mostrando o processo de build CI/CD:
+[Assistir](#)
+
+### JIRA - Sprint 03
+<img width="904" height="440" alt="image" src="https://github.com/user-attachments/assets/902d912c-8a09-43b2-9d47-9853d656d9a2" />
+
+### Issues/Bug tracker (GitHub)
+Adicionamos mais bugs e mais sugestões de melhorias para o projeto:
+#### Milestone da Sprint 3:
+![Milestone sprint 3](docs/imgs/milestone_sprint3.png)
+
+#### Issues fechadas:
+Conseguimos resolver a grande maioria das sugestões e bugs que encontramos no sistema:
+
+<img width="1009" height="554" alt="image" src="https://github.com/user-attachments/assets/96274566-ce31-4144-be08-8a901c894f95" />
+
+#### Issues em aberto:
+Ao final da entrega, algumas Issues ainda permaneceram, mas estas em sua maioria são sugestões de melhorias para a aplicação.
+
+<img width="1115" height="431" alt="image" src="https://github.com/user-attachments/assets/4b6c2061-bb94-4042-b5c2-8550cacf6ce2" />
+
+### `CONTRIBUTING.md`
+Criado arquivo explicando como pode-se contribuir com o projeto:
+[Acessar `CONTRIBUTING.md`](docs/CONTRIBUTING.md)
+
+### Programação em par (atualização)
+Nesta entrega, optamos por não utilizar a programação em par como nas outras entregas. Os desenvolvedores realizaram as atividades designadas e os demais membros se disponibilizaram para ajudar a cada um caso estivesse com dificuldades. Também foram designadas pessoas para fazer uma revisão de código antes de fazer merge nos Pull Requests para verificar se tudo estava de acordo com os parâmetros. Todos contribuiram para esta última entrega.
+
+
+</details>
+
 
 ---
 
@@ -198,6 +250,7 @@ Algumas dessas issues inclui a melhora de alguma funcionalidade do sistema e alg
       <td align="center" valign="top" width="14.28%"><a href="https://larissagiovanna.github.io/LarissaGiovanna/"><img src="https://avatars.githubusercontent.com/u/143462771?v=4?s=100" width="100px;" alt="Larissa Giovanna"/><br /><sub><b>Larissa Giovanna</b></sub></a><br /><a href="https://github.com/DoctahW/organizei/commits?author=LarissaGiovanna" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/RiosGabri"><img src="https://avatars.githubusercontent.com/u/222075163?v=4?s=100" width="100px;" alt="Gabriel Parméra"/><br /><sub><b>Gabriel Parméra</b></sub></a><br /><a href="https://github.com/DoctahW/organizei/commits?author=RiosGabri" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/DoctahW"><img src="https://avatars.githubusercontent.com/u/100718374?v=4?s=100" width="100px;" alt="João Euclides"/><br /><sub><b>João Euclides</b></sub></a><br /><a href="https://github.com/DoctahW/organizei/commits?author=DoctahW" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/felipeassiss"><img src="https://avatars.githubusercontent.com/u/169077824?v=4?s=100" width="100px;" alt="Felipe Assis"/><br /><sub><b>Felipe Assis</b></sub></a><br /><a href="https://github.com/felipeassiss/organizei/commits?author=felipeassiss" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

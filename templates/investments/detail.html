@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ investimento.nome }} — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/chart.css' %}">
+<link rel="stylesheet" href="{% static 'css/investments/investments.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+  {% if messages %}
+  <div class="messages-container" role="alert">
+    {% for message in messages %}
+    <div class="message message--{{ message.tags|default:'info' }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# ── Header ─────────────────────────────────────────────────── #}
+  <header class="detail-header">
+    <div class="detail-header__left">
+      <a href="{% url 'investments:list' %}" class="detail-header__back">&#8249;</a>
+      {% if investimento.ticker %}
+      <span class="detail-header__ticker">{{ investimento.ticker }}</span>
+      {% endif %}
+      <div class="detail-header__text">
+        <h1 class="detail-header__name">{{ investimento.nome }}</h1>
+        <span class="detail-header__type">
+          {% if investimento.tipo == 'acao' %}Ação
+          {% elif investimento.tipo == 'fii' %}FII
+          {% elif investimento.tipo == 'tesouro' %}Tesouro Direto
+          {% elif investimento.tipo == 'renda_fixa' %}Renda Fixa
+          {% elif investimento.tipo == 'crypto' %}Criptomoeda
+          {% elif investimento.tipo == 'etf' %}ETF
+          {% else %}{{ investimento.tipo|title }}{% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="detail-header__right">
+      <span class="detail-header__date">{{ hoje }}</span>
+      <span class="detail-header__dot"></span>
+    </div>
+  </header>
+
+  {# ── Hero Stats ─────────────────────────────────────────────── #}
+  <div class="detail-hero">
+    <div class="detail-hero__card glass">
+      <p class="detail-hero__label">VALOR ATUAL</p>
+      <p class="detail-hero__value">R$ {{ investimento.valor_atual|floatformat:2 }}</p>
+      <p class="detail-hero__sub detail-hero__sub--green">Aplicado R$ {{ investimento.valor_aplicado|floatformat:2 }}</p>
+    </div>
+    <div class="detail-hero__card glass">
+      <p class="detail-hero__label">RENDIMENTO</p>
+      <p class="detail-hero__value {% if investimento.rendimento >= 0 %}detail-hero__value--positive{% else %}detail-hero__value--negative{% endif %}">
+        {% if investimento.rendimento >= 0 %}+{% endif %}R$ {{ investimento.rendimento|floatformat:2 }}
+      </p>
+      <div class="detail-hero__meta">
+        <span class="detail-hero__badge {% if investimento.rendimento >= 0 %}detail-hero__badge--positive{% else %}detail-hero__badge--negative{% endif %}">
+          {% if investimento.rendimento >= 0 %}+{% endif %}{{ investimento.rentabilidade_pct }}%
+        </span>
+        <span class="detail-hero__qty">{{ investimento.quantidade|floatformat:4 }} {% if is_tesouro %}títulos{% else %}un.{% endif %}</span>
+      </div>
+    </div>
+  </div>
+
+  {# ── Metrics Row ────────────────────────────────────────────── #}
+  {% if investimento.preco_medio %}
+  <p class="detail-metrics">
+    <span>Preço médio R$ {{ investimento.preco_medio|floatformat:4 }}</span>
+    {% if investimento.pu_atual %}
+    <span class="detail-metrics__sep">·</span>
+    <span>PU atual R$ {{ investimento.pu_atual|floatformat:4 }}</span>
+    {% endif %}
+    {% if investimento.cotacao_atualizada_em %}
+    <span class="detail-metrics__sep">·</span>
+    <span>Cotação {{ investimento.cotacao_atualizada_em|date:"d/m" }} · {{ investimento.cotacao_atualizada_em|date:"H:i" }}</span>
+    {% endif %}
+  </p>
+  {% endif %}
+
+  {# ── Chart ──────────────────────────────────────────────────── #}
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">
+        <div class="chart-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+        </div>
+        Histórico
+      </div>
+    </div>
+    <div class="historico-chart-wrap">
+      <div id="historico-legend" class="historico-legend"></div>
+      <svg id="historico-chart" viewBox="0 0 1000 320" preserveAspectRatio="none" aria-label="Gráfico de evolução do valor"></svg>
+      <div id="historico-status" class="historico-status">Carregando…</div>
+      <div class="historico-crosshair"></div>
+      <div class="historico-hover-dot"></div>
+      <div class="historico-tooltip">
+        <span class="hist-tt-date"></span>
+        <span class="hist-tt-value"></span>
+      </div>
+    </div>
+  </div>
+
+  {# ── Actions ────────────────────────────────────────────────── #}
+  <div class="detail-actions">
+    <button type="button" class="button-glass detail-actions__btn" data-open-modal="modal-aporte">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Novo aporte
+    </button>
+    <button type="button" class="button-glass detail-actions__btn" data-open-modal="modal-resgate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="7 17 17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+      Resgate parcial
+    </button>
+    {% if investimento.ticker %}
+    <form method="POST" action="{% url 'investments:update_quote' investimento.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="button-glass detail-actions__btn detail-actions__btn--muted">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Atualizar
+      </button>
+    </form>
+    {% endif %}
+    <form method="POST" action="{% url 'investments:delete' investimento.pk %}" class="detail-actions__delete" onsubmit="return confirm('Excluir este investimento e todas as movimentações?');">
+      {% csrf_token %}
+      <button type="submit" class="button-glass detail-actions__btn detail-actions__btn--danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        Excluir
+      </button>
+    </form>
+  </div>
+
+  {# ── Transactions ───────────────────────────────────────────── #}
+  <section class="movs-section">
+    <h2 class="movs-section__title">EXTRATO DE MOVIMENTAÇÕES</h2>
+    <div class="movs-list">
+      {% for mov in movimentacoes %}
+      <div class="mov-card glass {% if mov.tipo == 'venda' %}mov-card--venda{% endif %}">
+        <div class="mov-card__icon {% if mov.tipo == 'venda' %}mov-card__icon--venda{% else %}mov-card__icon--compra{% endif %}">
+          {% if mov.tipo == 'venda' %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="7 17 17 7"/><polyline points="7 7 17 7 17 17"/></svg>
+          {% else %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          {% endif %}
+        </div>
+        <div class="mov-card__body">
+          <div class="mov-card__row">
+            <span class="mov-card__type">{{ mov.get_tipo_display }}</span>
+            <span class="mov-card__qtd">{{ mov.quantidade|floatformat:4 }} un.</span>
+          </div>
+          <div class="mov-card__info">
+            <span class="mov-card__date">{{ mov.data|date:"d/m/Y" }}</span>
+            {% if mov.observacao %}<span class="mov-card__obs">{{ mov.observacao }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="mov-card__right">
+          <span class="mov-card__valor {% if mov.tipo == 'venda' %}mov-card__valor--positive{% else %}mov-card__valor--negative{% endif %}">
+            {% if mov.tipo == 'venda' %}+{% else %}-{% endif %}R$ {{ mov.valor|floatformat:2 }}
+          </span>
+          {% if mov.pu_na_data %}
+          <span class="mov-card__pu">PU R$ {{ mov.pu_na_data|floatformat:4 }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <p class="tx-empty">Sem movimentações ainda.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+
+{# ── Modais ──────────────────────────────────────────────────────── #}
+
+<div class="modal-backdrop" id="modal-aporte" data-modal hidden>
+  <div class="modal glass" role="dialog" aria-labelledby="modal-aporte-title">
+    <button type="button" class="modal__close" data-close-modal aria-label="Fechar">&times;</button>
+    <h2 class="modal__title" id="modal-aporte-title">Novo aporte</h2>
+    <form method="POST" action="{% url 'investments:add_aporte' investimento.pk %}" class="form-body">
+      {% csrf_token %}
+      <div class="field">
+        <label>Data</label>
+        <input type="date" name="data" value="{{ hoje }}" required lang="pt-BR">
+      </div>
+      <div class="field">
+        <label>Valor investido (R$)</label>
+        <input type="number" name="valor" step="0.01" min="0" placeholder="Ex.: 200,00" required>
+        {% if is_tesouro %}
+        <small class="field-hint">Quantidade é calculada a partir do PU da data.</small>
+        {% endif %}
+      </div>
+      {% if is_brapi %}
+      <div class="field">
+        <label>Quantidade comprada</label>
+        <input type="number" name="quantidade" step="0.0001" min="0" placeholder="Ex.: 5" required>
+      </div>
+      {% endif %}
+      <div class="field">
+        <label>Observação (opcional)</label>
+        <input type="text" name="observacao" maxlength="200" placeholder="Ex.: aporte mensal">
+      </div>
+      <button type="submit" class="btn-submit">Registrar aporte</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-resgate" data-modal hidden>
+  <div class="modal glass" role="dialog" aria-labelledby="modal-resgate-title">
+    <button type="button" class="modal__close" data-close-modal aria-label="Fechar">&times;</button>
+    <h2 class="modal__title" id="modal-resgate-title">Resgate parcial</h2>
+    <form method="POST" action="{% url 'investments:add_resgate' investimento.pk %}" class="form-body">
+      {% csrf_token %}
+      <div class="field">
+        <label>Data</label>
+        <input type="date" name="data" value="{{ hoje }}" required lang="pt-BR">
+      </div>
+      <div class="field">
+        <label>Valor recebido (R$)</label>
+        <input type="number" name="valor" step="0.01" min="0" placeholder="Ex.: 100,00" required>
+        {% if is_tesouro %}
+        <small class="field-hint">Quantidade vendida calculada pelo PU de venda na data.</small>
+        {% endif %}
+      </div>
+      {% if is_brapi %}
+      <div class="field">
+        <label>Quantidade vendida</label>
+        <input type="number" name="quantidade" step="0.0001" min="0" max="{{ investimento.quantidade }}" placeholder="Máx: {{ investimento.quantidade|floatformat:4 }}" required>
+      </div>
+      {% endif %}
+      <div class="field">
+        <label>Observação (opcional)</label>
+        <input type="text" name="observacao" maxlength="200" placeholder="Ex.: venda parcial">
+      </div>
+      <button type="submit" class="btn-submit">Registrar resgate</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  window.INVESTMENT_HISTORY_URL = "{% url 'investments:history' investimento.pk %}";
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/components/chart.js' %}"></script>
+<script src="{% static 'js/investments/detail.js' %}"></script>
+{% endblock %}

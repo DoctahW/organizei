@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/transactions/list_transactions.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+    <div class="hero-card">
+        <div class="hero-stat">
+            <p class="stat-label">A pagar</p>
+            <p class="stat-value" style="color: var(--color-income);">R$ {{ total_a_pagar|default:0|floatformat:2 }}</p>
+        </div>
+        <div class="hero-stat">
+            <p class="stat-label">Pago</p>
+            <p class="stat-value" style="color: var(--color-expense);">R$ {{ total_pago|default:0|floatformat:2 }}</p>
+        </div>
+        <div class="hero-stat">
+            <p class="stat-label">Total</p>
+            <p class="stat-value" style="color: var(--color-primary);">R$ {{ total_geral|default:0|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <p style="font-size: 24px; font-weight: 800; color: var(--text-body); line-height: 1.5;">Minhas Assinaturas</p>
+        <button onclick="document.getElementById('modal-add').style.display='flex'" class="button-glass">
+            + Nova assinatura
+        </button>
+    </div>
+
+    <div class="tx-groups">
+        {% for sub in subscriptions %}
+        <a href="{% url 'subscriptions:subscription_detail' sub.pk %}" style="text-decoration: none; color: inherit;">
+            <div class="tx-item glass">
+                <div class="tx-item__icon tx-item__icon--expense">
+                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; flex-shrink: 0;">
+                        <line x1="12" y1="2" x2="2" y2="12"/>
+                        <polyline points="9 12 2 12 2 5"/>
+                    </svg>
+                </div>
+                <div class="tx-item__info">
+                    <p class="tx-item__name">{{ sub.name }}</p>
+                    <div class="tx-item__meta">
+                        <span>Início: {{ sub.start_date|date:"d/m/Y" }}</span>
+                        <span class="tx-item__meta-dot">·</span>
+                        <span style="color: var(--color-primary);">{{ sub.remaining_months }} {% if sub.remaining_months == 1 %}mês restante{% else %}meses restantes{% endif %}</span>
+                    </div>
+                </div>
+                <p class="tx-item__amount tx-item__amount--expense">- R$ {{ sub.value|floatformat:2 }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <div class="tx-empty">
+            <p>Nenhuma assinatura cadastrada.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="modal-add" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:999; justify-content:center; align-items:center;">
+        <div class="glass" style="padding:32px; border-radius: var(--radius-2xl); width:90%; max-width:400px; display:flex; flex-direction:column; gap:16px;">
+            <p style="font-size: 1.1rem; font-weight: 800; color: var(--color-primary); margin: 0;">Nova Assinatura</p>
+            <form method="post" action="{% url 'subscriptions:manage_subscriptions' %}" style="display:flex; flex-direction:column; gap:14px;">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="Nome" required class="input-box">
+                <input type="date" name="start_date" required class="input-box" style="margin-top: 0;">
+                <input type="text" name="value" placeholder="Valor (Ex: 55,90)" required class="input-box">
+                <select name="conta_id" required class="input-box">
+                    <option value="">Selecione a conta bancária</option>
+                    {% for conta in contas %}
+                    <option value="{{ conta.id }}">{{ conta.nickname|default:conta.bank.name }} - {{ conta.number }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="button-glass button-glass--active" style="margin-top: 4px;">Salvar</button>
+                <button type="button" onclick="document.getElementById('modal-add').style.display='none'" style="background:none; color: var(--text-muted); border:none; cursor:pointer; font-size:0.85rem; height: 36px;">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+</main>
+{% endblock %}

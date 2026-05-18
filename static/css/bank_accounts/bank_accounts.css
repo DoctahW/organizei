@@ -12,7 +12,6 @@ body {
     justify-content: center;
     align-items: center;
     min-height: auto;
-    padding: 10px 64px 80px;
 }
 
 .accounts-container {
@@ -24,9 +23,10 @@ body {
 .title {
     font-size: 32px;
     font-weight: bold;
-    color: #FFD633;
+    color: var(--color-primary);
     text-align: center;
     margin-bottom: 30px;
+    padding-top: 20px;
 }
 
 .accounts-card {
@@ -34,7 +34,7 @@ body {
     border-radius: 20px;
     padding: 24px;
     margin-bottom: 40px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     min-height: 200px;
     display: grid;
     gap: 16px;
@@ -47,7 +47,11 @@ body {
     gap: 16px;
     padding: 18px 20px;
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.02)
+    );
     border: 1px solid rgba(255, 255, 255, 0.08);
     text-align: left;
 }
@@ -82,7 +86,7 @@ body {
     justify-content: center;
     border-radius: 999px;
     background: rgba(255, 214, 51, 0.14);
-    color: #ffd633;
+    color: var(--color-primary);
     flex: 0 0 auto;
     font-size: 11px;
     font-weight: 800;
@@ -98,7 +102,7 @@ body {
     font-size: 13px;
     font-weight: 700;
     color: #121212;
-    background: #ffd633;
+    background: var(--color-primary);
 }
 
 .account-label {
@@ -160,7 +164,7 @@ body {
 .tx-empty {
     text-align: center;
     font-size: 18px;
-    color: #6C6C6C;
+    color: #6c6c6c;
 }
 
 .button-area {
@@ -169,22 +173,58 @@ body {
 }
 
 @media (max-width: 768px) {
+    .title {
+        font-size: 24px;
+        margin-bottom: 22px;
+    }
+
+    .accounts-container {
+        padding: 0;
+    }
+
     .accounts-card {
-        padding: 18px;
+        padding: 14px;
     }
 
     .account-item {
         flex-direction: column;
         align-items: stretch;
-        padding: 16px;
+        gap: 14px;
+        padding: 20px;
+    }
+
+    .account-topline {
+        gap: 10px;
+        margin-bottom: 4px;
     }
 
     .account-bank {
         font-size: 18px;
     }
 
+    .account-label {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    .account-meta {
+        font-size: 14px;
+    }
+
+    .account-actions {
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .account-balance {
+        font-size: 20px;
+    }
+
     .account-delete-btn {
-        width: 100%;
+        min-height: 42px;
+        padding: 0 18px;
     }
 }
 
@@ -205,22 +245,22 @@ body {
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
 }
 
 .form-group input {
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: inherit;
 }
 
 .btn-secondary {
-  /* mesmo estilo do btn-primary mas com fundo transparente */
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+    /* mesmo estilo do btn-primary mas com fundo transparente */
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }

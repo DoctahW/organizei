@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
+from apps.bank_accounts.models import Bank, Conta
 from django.urls import reverse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -7,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-_DEFAULT_WAIT = 10
+_DEFAULT_WAIT = 20
 
 
 class E2EBaseTest(StaticLiveServerTestCase):
@@ -31,18 +33,31 @@ class E2EBaseTest(StaticLiveServerTestCase):
     def wait(self, timeout=_DEFAULT_WAIT):
         return WebDriverWait(self.driver, timeout)
 
-    def create_user(self, username="testuser", password="testpass123"):
-        return User.objects.create_user(username=username, password=password)
+    def create_user(self, username="testuser", password="testpass123", with_account=True):
+        user = User.objects.create_user(username=username, password=password)
+        if with_account:
+            bank, _ = Bank.objects.get_or_create(name="Banco Teste")
+            Conta.objects.create(
+                bank=bank,
+                usuario=user,
+                account_type="corrente",
+                number="00000",
+            )
+        return user
 
     def login_via_ui(self, username="testuser", password="testpass123"):
         self.driver.get(f"{self.live_server_url}/accounts/login/")
-        self.wait().until(EC.presence_of_element_located((By.ID, "id_username")))
-        self.driver.find_element(By.ID, "id_username").clear()
-        self.driver.find_element(By.ID, "id_username").send_keys(username)
-        self.driver.find_element(By.ID, "id_password").clear()
-        self.driver.find_element(By.ID, "id_password").send_keys(password)
-        self.driver.find_element(By.CSS_SELECTOR, ".btn-login").click()
-        self.wait().until(EC.url_changes(f"{self.live_server_url}/accounts/login/"))
+        self.wait().until(EC.presence_of_element_located((By.ID, "login-username")))
+        self.driver.find_element(By.ID, "login-username").clear()
+        self.driver.find_element(By.ID, "login-username").send_keys(username)
+        self.driver.find_element(By.ID, "login-password").clear()
+        self.driver.find_element(By.ID, "login-password").send_keys(password)
+        self.driver.find_element(By.CSS_SELECTOR, "#login-panel .auth-form__btn").click()
+        login_url = f"{self.live_server_url}/accounts/login/"
+        self.wait(timeout=40).until(EC.url_changes(login_url))
+        self.wait(timeout=20).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
+        )
 
     def goto(self, reverse_name, **kwargs):
         url = self.live_server_url + reverse(reverse_name, **kwargs)
