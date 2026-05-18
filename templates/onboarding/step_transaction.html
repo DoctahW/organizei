@@ -1,0 +1,71 @@
+{% extends "onboarding/_layout.html" %}
+
+{% block title %}Primeira transação — Organizei{% endblock %}
+
+{% block onboarding_title %}Registre sua primeira transação{% endblock %}
+{% block onboarding_subtitle %}Comece com algo simples - uma entrada de salário, uma compra recente. Você pode pular e voltar depois.{% endblock %}
+
+{% block onboarding_body %}
+<form method="post" class="onboarding-form">
+  {% csrf_token %}
+
+  <label class="onboarding-field">
+    <span>Tipo</span>
+    <select name="transaction_type" required class="input-box">
+      <option value="">Selecione o tipo</option>
+      {% for value, label in transaction_type_choices %}
+      <option value="{{ value }}" {% if form_data.transaction_type == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    {% if errors.transaction_type %}<span class="field-error">{{ errors.transaction_type }}</span>{% endif %}
+  </label>
+
+  <label class="onboarding-field">
+    <span>Nome da transação</span>
+    <input class="input-box" type="text" name="name" placeholder="Ex.: Conta de energia" value="{{ form_data.name|default:'' }}" required>
+    {% if errors.name %}<span class="field-error">{{ errors.name }}</span>{% endif %}
+  </label>
+
+  <div class="onboarding-grid">
+    <label class="onboarding-field">
+      <span>Valor (R$)</span>
+      <input class="input-box" type="text" inputmode="decimal" name="value" placeholder="0,00" value="{{ form_data.value|default:'' }}" required>
+      {% if errors.value %}<span class="field-error">{{ errors.value }}</span>{% endif %}
+    </label>
+
+    <label class="onboarding-field">
+      <span>Data</span>
+      <input class="input-box" type="date" name="date" value="{{ form_data.date|default:'' }}">
+    </label>
+  </div>
+
+  <label class="onboarding-field">
+    <span>Conta bancária</span>
+    <select name="conta_id" required class="input-box">
+      <option value="">Selecione a conta</option>
+      {% for conta in contas %}
+      <option value="{{ conta.id }}" {% if form_data.conta_id == conta.id|stringformat:"s" %}selected{% endif %}>
+        {{ conta.nickname|default:conta.bank.name }}
+      </option>
+      {% endfor %}
+    </select>
+    {% if errors.conta_id %}<span class="field-error">{{ errors.conta_id }}</span>{% endif %}
+  </label>
+
+  <label class="onboarding-field">
+    <span>Categoria (opcional)</span>
+    <select name="category_id" class="input-box">
+      <option value="">Sem categoria</option>
+      {% for category in categories %}
+      <option value="{{ category.id }}" {% if form_data.category_id == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <div class="onboarding-actions onboarding-actions--split">
+    <a href="{% url 'onboarding:step_investment' %}" class="button-glass onboarding-action-skip">Pular</a>
+    <button type="submit" class="button-glass button-glass--active onboarding-action-primary">Adicionar e continuar</button>
+  </div>
+  <a href="{% url 'onboarding:finish' %}" class="onboarding-finish-link">Ir direto para o dashboard</a>
+</form>
+{% endblock %}
