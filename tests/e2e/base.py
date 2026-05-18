@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
+from apps.bank_accounts.models import Bank, Conta
 from django.urls import reverse
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -31,8 +33,17 @@ class E2EBaseTest(StaticLiveServerTestCase):
     def wait(self, timeout=_DEFAULT_WAIT):
         return WebDriverWait(self.driver, timeout)
 
-    def create_user(self, username="testuser", password="testpass123"):
-        return User.objects.create_user(username=username, password=password)
+    def create_user(self, username="testuser", password="testpass123", with_account=True):
+        user = User.objects.create_user(username=username, password=password)
+        if with_account:
+            bank, _ = Bank.objects.get_or_create(name="Banco Teste")
+            Conta.objects.create(
+                bank=bank,
+                usuario=user,
+                account_type="corrente",
+                number="00000",
+            )
+        return user
 
     def login_via_ui(self, username="testuser", password="testpass123"):
         self.driver.get(f"{self.live_server_url}/accounts/login/")
