@@ -7,37 +7,185 @@
 {% block tab_bar %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/accounts/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/accounts/auth.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="login-wrapper">
-  <div class="login-card glass">
-    <h1 class="login-card__brand">
-      <img src="{% static 'img/logo.png' %}" alt="Logo Organizei" class="login-card__logo">
-      Organizei
-    </h1>
-    <p class="login-card__subtitle">Entre na sua conta</p>
+<div class="auth-wrapper" data-active-panel="{{ active_panel }}">
 
-    {% if error %}
-    <ul class="error-list">
-      <li>{{ error }}</li>
-    </ul>
-    {% endif %}
+  <!-- LOGIN PANEL -->
+  <div class="auth-panel {% if active_panel != 'register' %}auth-panel--active{% endif %}" id="login-panel">
+    <div class="auth-panel__form-side">
+      <form method="post" class="auth-form">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="login">
+        <input type="hidden" name="next" value="{{ next }}">
 
-    <form method="post">
-      {% csrf_token %}
-      <div class="field">
-        <label for="id_username">Usuário</label>
-        <input type="text" name="username" id="id_username" autofocus>
+        <h1 class="auth-form__brand">
+          <img src="{% static 'img/logo.png' %}" alt="Logo" class="auth-form__logo">
+          Organizei
+        </h1>
+        <h2 class="auth-form__title">Bem-vindo de volta</h2>
+        <p class="auth-form__subtitle">Entre na sua conta para continuar</p>
+
+        {% if error %}
+        <div class="auth-errors">
+          <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <div class="auth-field">
+          <label for="login-username">Usuário</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" name="username" id="login-username" placeholder="Seu usuário" autofocus>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="login-password">Senha</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" name="password" id="login-password" placeholder="Sua senha">
+            <button type="button" class="auth-field__eye" aria-label="Mostrar senha" data-toggle-password>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <a href="#" class="auth-form__forgot">Esqueceu a senha?</a>
+
+        <button type="submit" class="auth-form__btn">Entrar</button>
+
+        <p class="auth-form__toggle">
+          Não tem uma conta?
+          <a href="#" class="js-toggle-register">Criar conta</a>
+        </p>
+      </form>
+    </div>
+
+    <div class="auth-panel__image-side">
+      <div class="auth-image__overlay"></div>
+      <div class="auth-image__content">
+        <h2>Invista com inteligência e segurança</h2>
+        <p>Gerencie suas finanças, acompanhe seus investimentos e alcance seus objetivos financeiros.</p>
+        <div class="auth-image__stats">
+          <div class="auth-image__stat">
+            <span class="auth-image__stat-value">R$ 0</span>
+            <span class="auth-image__stat-label">Taxa mensal</span>
+          </div>
+          <div class="auth-image__stat">
+            <span class="auth-image__stat-value">100%</span>
+            <span class="auth-image__stat-label">Gratuito</span>
+          </div>
+          <div class="auth-image__stat">
+            <span class="auth-image__stat-value">5 min</span>
+            <span class="auth-image__stat-label">Para começar</span>
+          </div>
+        </div>
       </div>
-      <div class="field">
-        <label for="id_password">Senha</label>
-        <input type="password" name="password" id="id_password">
-      </div>
-      <input type="hidden" name="next" value="{{ next }}">
-      <button type="submit" class="btn-login">Entrar</button>
-    </form>
+    </div>
   </div>
+
+  <!-- REGISTER PANEL -->
+  <div class="auth-panel {% if active_panel == 'register' %}auth-panel--active{% endif %}" id="register-panel">
+    <div class="auth-panel__image-side">
+      <div class="auth-image__overlay"></div>
+      <div class="auth-image__content">
+        <h2>Comece sua jornada de investimentos</h2>
+        <p>Junte-se a milhares de usuários que já estão organizando suas finanças.</p>
+        <div class="auth-image__stats">
+          <div class="auth-image__stat">
+            <span class="auth-image__stat-value">100%</span>
+            <span class="auth-image__stat-label">Gratuito</span>
+          </div>
+          <div class="auth-image__stat">
+            <span class="auth-image__stat-value">5 min</span>
+            <span class="auth-image__stat-label">Para começar</span>
+          </div>
+          <div class="auth-image__stat">
+            <span class="auth-image__stat-value">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="auth-image__stat-label">Seguro e Protegido</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-panel__form-side">
+      <form method="post" class="auth-form">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="register">
+
+        <h1 class="auth-form__brand">
+          <img src="{% static 'img/logo.png' %}" alt="Logo" class="auth-form__logo">
+          Organizei
+        </h1>
+        <h2 class="auth-form__title">Criar conta</h2>
+        <p class="auth-form__subtitle">Comece a organizar suas finanças hoje</p>
+
+        {% if errors %}
+        <div class="auth-errors">
+          <ul>
+            {% for e in errors %}
+            <li>{{ e }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <div class="auth-field">
+          <label for="register-fullname">Nome completo</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" name="full_name" id="register-fullname" placeholder="Seu nome completo">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="register-email">Email</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" name="email" id="register-email" placeholder="seu@email.com">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="register-password">Senha</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" name="password" id="register-password" placeholder="Mínimo 8 caracteres">
+            <button type="button" class="auth-field__eye" aria-label="Mostrar senha" data-toggle-password>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="register-confirm-password">Confirmar senha</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" name="confirm_password" id="register-confirm-password" placeholder="Repita a senha">
+            <button type="button" class="auth-field__eye" aria-label="Mostrar senha" data-toggle-password>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="auth-form__btn">Criar conta</button>
+
+        <p class="auth-form__toggle">
+          Já tem uma conta?
+          <a href="#" class="js-toggle-login">Fazer login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/auth.js' %}"></script>
 {% endblock %}

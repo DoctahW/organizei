@@ -36,12 +36,12 @@ class E2EBaseTest(StaticLiveServerTestCase):
 
     def login_via_ui(self, username="testuser", password="testpass123"):
         self.driver.get(f"{self.live_server_url}/accounts/login/")
-        self.wait().until(EC.presence_of_element_located((By.ID, "id_username")))
-        self.driver.find_element(By.ID, "id_username").clear()
-        self.driver.find_element(By.ID, "id_username").send_keys(username)
-        self.driver.find_element(By.ID, "id_password").clear()
-        self.driver.find_element(By.ID, "id_password").send_keys(password)
-        self.driver.find_element(By.CSS_SELECTOR, ".btn-login").click()
+        self.wait().until(EC.presence_of_element_located((By.ID, "login-username")))
+        self.driver.find_element(By.ID, "login-username").clear()
+        self.driver.find_element(By.ID, "login-username").send_keys(username)
+        self.driver.find_element(By.ID, "login-password").clear()
+        self.driver.find_element(By.ID, "login-password").send_keys(password)
+        self.driver.find_element(By.CSS_SELECTOR, "#login-panel .auth-form__btn").click()
         login_url = f"{self.live_server_url}/accounts/login/"
         self.wait(timeout=40).until(EC.url_changes(login_url))
         self.wait(timeout=20).until(

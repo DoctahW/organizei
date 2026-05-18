@@ -42,7 +42,7 @@
             {% if errors.value %}<p class="field-error">{{ errors.value }}</p>{% endif %}
         </section>
 
-        <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
+        <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;" required>
             <option value="">Selecione a conta bancária</option>
             {% for conta in contas %}
             <option value="{{ conta.id }}" {% if form_data.conta_id == conta.id|stringformat:"s" %}selected{% endif %}>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Minha Conta — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <div class="account-card glass">
+    <h1 class="account-card__title">Minha conta</h1>
+
+    {% if saved %}
+    <div class="account-success">
+      <p>Alterações salvas com sucesso!</p>
+    </div>
+    {% endif %}
+
+    {% if errors %}
+    <div class="account-errors">
+      <ul>
+        {% for e in errors %}
+        <li>{{ e }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" class="account-form">
+      {% csrf_token %}
+
+      <div class="account-field">
+        <label>Usuário</label>
+        <input type="text" value="{{ user_obj.username }}" disabled class="account-field__input account-field__input--disabled">
+      </div>
+
+      <div class="account-field">
+        <label for="id_first_name">Nome</label>
+        <input type="text" name="first_name" id="id_first_name" value="{{ user_obj.first_name }}" class="account-field__input">
+      </div>
+
+      <div class="account-field">
+        <label for="id_last_name">Sobrenome</label>
+        <input type="text" name="last_name" id="id_last_name" value="{{ user_obj.last_name }}" class="account-field__input">
+      </div>
+
+      <div class="account-field">
+        <label for="id_email">Email</label>
+        <input type="email" name="email" id="id_email" value="{{ user_obj.email }}" class="account-field__input">
+      </div>
+
+      <button type="submit" class="account-form__btn">Salvar alterações</button>
+    </form>
+
+    <a href="{% url 'accounts:password_change' %}" class="account-card__link">Alterar senha</a>
+  </div>
+</div>
+{% endblock %}

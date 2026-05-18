@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from .base import E2EBaseTest
 from apps.subscriptions.models import Subscription
 from apps.transactions.models import Transaction
+from apps.bank_accounts.models import Conta, Bank
 
 
 @tag("e2e")
@@ -16,6 +17,8 @@ class SubscriptionsE2ETest(E2EBaseTest):
         self.login_via_ui()
         self.client = Client()
         self.client.login(username='testuser', password='testpass123')
+        self.bank = Bank.objects.create(name="Test Bank")
+        self.conta = Conta.objects.create(bank=self.bank, usuario=self.user, account_type="corrente", number="12345")
 
     def _create_subscription_via_form(self, name, start_date, value):
         """Create subscription via direct POST to the form (backend).
@@ -27,6 +30,7 @@ class SubscriptionsE2ETest(E2EBaseTest):
             'name': name,
             'start_date': start_date,
             'value': value,  # value like "29,90" or "29.90"
+            'conta_id': str(self.conta.pk),
         })
         # Verify redirect (successful POST)
         self.assertEqual(response.status_code, 302)

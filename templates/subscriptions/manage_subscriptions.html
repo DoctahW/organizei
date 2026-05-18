@@ -66,6 +66,12 @@
                 <input type="text" name="name" placeholder="Nome" required class="input-box">
                 <input type="date" name="start_date" required class="input-box" style="margin-top: 0;">
                 <input type="text" name="value" placeholder="Valor (Ex: 55,90)" required class="input-box">
+                <select name="conta_id" required class="input-box">
+                    <option value="">Selecione a conta bancária</option>
+                    {% for conta in contas %}
+                    <option value="{{ conta.id }}">{{ conta.nickname|default:conta.bank.name }} - {{ conta.number }}</option>
+                    {% endfor %}
+                </select>
                 <button type="submit" class="button-glass button-glass--active" style="margin-top: 4px;">Salvar</button>
                 <button type="button" onclick="document.getElementById('modal-add').style.display='none'" style="background:none; color: var(--text-muted); border:none; cursor:pointer; font-size:0.85rem; height: 36px;">Cancelar</button>
             </form>

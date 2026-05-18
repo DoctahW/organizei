@@ -56,6 +56,8 @@
                 Alterações aplicadas a esta e às cobranças seguintes.
             </p>
 
+            <input type="hidden" name="conta_id" value="{{ form_data.conta_id|default:'' }}">
+
             <button type="submit" class="button-glass" id="sent-transaction-btn" style="width: 100%;">
                 Salvar Alterações
             </button>
@@ -114,8 +116,8 @@
                 </div>
             </div>
 
-            <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;">
-                <option value="">Selecione a conta bancária (Opcional)</option>
+            <select name="conta_id" class="transaction_type_select" style="margin-bottom: 15px;" required>
+                <option value="">Selecione a conta bancária</option>
                 {% for conta in contas %}
                 <option value="{{ conta.id }}" {% if form_data.conta_id == conta.id|stringformat:"s" %}selected{% endif %}>
                     {{ conta.nickname|default:conta.bank.name }} - {{ conta.number }}
