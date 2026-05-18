@@ -225,3 +225,93 @@
 @keyframes histPing {
   75%, 100% { transform: scale(2); opacity: 0 }
 }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .chart-card {
+    padding: 16px;
+  }
+
+  .chart-header {
+    margin-bottom: 12px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+  }
+
+  .chart-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .chart-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  #historico-chart {
+    height: 220px;
+  }
+
+  .historico-legend {
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+
+  .legend-swatch {
+    width: 10px;
+    height: 10px;
+  }
+
+  .historico-note {
+    font-size: 0.75rem;
+  }
+
+  .historico-tooltip {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    border-radius: 10px;
+    min-width: 120px;
+  }
+
+  .historico-tooltip .hist-tt-date {
+    font-size: 0.7rem;
+  }
+
+  .historico-axis-text {
+    font-size: 16px;
+  }
+
+  .historico-grid-line {
+    opacity: 0.3;
+  }
+}
+
+@media (max-width: 480px) {
+  #historico-chart {
+    height: 200px;
+  }
+
+  .historico-legend {
+    gap: 8px;
+    font-size: 0.75rem;
+  }
+
+  .legend-item {
+    gap: 4px;
+  }
+
+  .legend-swatch {
+    width: 8px;
+    height: 8px;
+  }
+
+  .historico-axis-text {
+    display: none;
+  }
+
+  .historico-grid-line {
+    display: none;
+  }
+}

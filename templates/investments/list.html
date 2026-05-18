@@ -18,20 +18,22 @@
   </div>
   {% endif %}
 
-  <div class="hero-card">
-    <div class="hero-stat">
-      <p class="stat-label">Total Aplicado</p>
-      <p class="stat-value">R$ {{ total_aplicado|floatformat:2 }}</p>
+  <div class="detail-hero">
+    <div class="detail-hero__card glass">
+      <p class="detail-hero__label">VALOR ATUAL</p>
+      <p class="detail-hero__value">R$ {{ total_atual|floatformat:2 }}</p>
+      <p class="detail-hero__sub detail-hero__sub--green">Aplicado R$ {{ total_aplicado|floatformat:2 }}</p>
     </div>
-    <div class="hero-stat">
-      <p class="stat-label">Valor Atual</p>
-      <p class="stat-value">R$ {{ total_atual|floatformat:2 }}</p>
-    </div>
-    <div class="hero-stat">
-      <p class="stat-label">Rendimento</p>
-      <p class="stat-value {% if rendimento_total < 0 %}text-negative{% endif %}">
-        R$ {{ rendimento_total|floatformat:2 }} ({{ rentabilidade_total }}%)
+    <div class="detail-hero__card glass">
+      <p class="detail-hero__label">RENDIMENTO</p>
+      <p class="detail-hero__value {% if rendimento_total >= 0 %}detail-hero__value--positive{% else %}detail-hero__value--negative{% endif %}">
+        {% if rendimento_total >= 0 %}+{% endif %}R$ {{ rendimento_total|floatformat:2 }}
       </p>
+      <div class="detail-hero__meta">
+        <span class="detail-hero__badge {% if rendimento_total >= 0 %}detail-hero__badge--positive{% else %}detail-hero__badge--negative{% endif %}">
+          {% if rendimento_total >= 0 %}+{% endif %}{{ rentabilidade_total }}%
+        </span>
+      </div>
     </div>
   </div>
 
@@ -52,21 +54,9 @@
           </h2>
           <span class="investment-card__type">{{ inv.get_tipo_display }}</span>
         </div>
-        <div class="inv-chip-row">
-          <span class="inv-chip {% if inv.rendimento >= 0 %}inv-chip-up{% else %}inv-chip-down{% endif %}">
-            {% if inv.rendimento >= 0 %}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg>
-            {% else %}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M3 7l6 6 4-4 8 8M14 17h7v-7"/></svg>
-            {% endif %}
-            <span class="num">
-              {% if inv.rendimento >= 0 %}+{% endif %}R$ {{ inv.rendimento|floatformat:2 }}
-            </span>
-          </span>
-          <span class="inv-chip-sub">
-            {% if inv.rendimento >= 0 %}+{% endif %}{{ inv.rentabilidade_pct }}%
-          </span>
-        </div>
+        <span class="inv-pct-badge {% if inv.rendimento >= 0 %}inv-pct-badge--up{% else %}inv-pct-badge--down{% endif %}">
+          {% if inv.rendimento >= 0 %}+{% endif %}{{ inv.rentabilidade_pct }}%
+        </span>
       </div>
 
       <div class="investment-card__values">
@@ -80,7 +70,7 @@
         </div>
         <div>
           <span class="value-label">Rendimento</span>
-          <span class="value {% if inv.rendimento < 0 %}text-negative{% endif %}">
+          <span class="value {% if inv.rendimento >= 0 %}text-positive{% else %}text-negative{% endif %}">
             R$ {{ inv.rendimento|floatformat:2 }}
           </span>
         </div>

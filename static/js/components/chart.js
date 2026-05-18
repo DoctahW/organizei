@@ -18,10 +18,11 @@
     );
   }
 
-  function fmtBRSimple(n) {
+  function fmtBRSimple(n, decimals) {
+    decimals = decimals === undefined ? 0 : decimals;
     return Number(n).toLocaleString("pt-BR", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
     });
   }
 
@@ -78,8 +79,11 @@
     var rawMin = Math.min.apply(null, allValues);
     var rawMax = Math.max.apply(null, allValues);
     var range = rawMax - rawMin || 1;
-    var yMin = Math.floor((rawMin - range * 0.35) / 100) * 100;
-    var yMax = Math.ceil((rawMax + range * 0.35) / 100) * 100;
+    // Zoom in for tiny ranges so small variations are visible
+    var avgValue = (rawMin + rawMax) / 2;
+    var minRange = Math.max(range * 3, avgValue * 0.005);
+    var yMin = rawMin - (minRange - range) / 2;
+    var yMax = rawMax + (minRange - range) / 2;
 
     var ptsValor = buildPoints(seriesValor, yMin, yMax);
     var ptsCusto = buildPoints(seriesCusto, yMin, yMax);
@@ -101,6 +105,7 @@
 
     var gridSvg = "", labelsSvg = "";
     var gridSteps = 4;
+    var labelDecimals = range < 10 ? 2 : 0;
     for (var i = 0; i <= gridSteps; i++) {
       var gy = PAD_T + (i / gridSteps) * CH;
       var gv = yMax - (i / gridSteps) * (yMax - yMin);
@@ -112,7 +117,7 @@
       labelsSvg +=
         '<text class="historico-axis-text" x="' + (PAD_L - 10) +
         '" y="' + (gy + 4).toFixed(1) +
-        '" text-anchor="end">' + fmtBRSimple(gv) + "</text>";
+        '" text-anchor="end">' + fmtBRSimple(gv, labelDecimals) + "</text>";
     }
 
     var xLabelsSvg = "";
@@ -132,6 +137,10 @@
 
     var last = ptsValor[ptsValor.length - 1];
 
+    var areaSvg = points.length > 1
+      ? '<path class="historico-area" d="' + areaPath + '" fill="url(#histAreaGrad)"/>'
+      : '';
+
     svgEl.innerHTML =
       "<defs>" +
       '<linearGradient id="histAreaGrad" x1="0" y1="0" x2="0" y2="1">' +
@@ -141,7 +150,7 @@
       "</linearGradient>" +
       "</defs>" +
       gridSvg + labelsSvg + xLabelsSvg +
-      '<path class="historico-area" d="' + areaPath + '" fill="url(#histAreaGrad)"/>' +
+      areaSvg +
       '<path d="' + custoPath + '" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-dasharray="4 4" stroke-linecap="round"/>' +
       '<path class="historico-line-glow" d="' + linePath + '" stroke="' + trendColor + '"/>' +
       '<path class="historico-line" id="histLineMain" d="' + linePath + '" stroke="' + trendColor + '"/>' +

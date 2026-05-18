@@ -578,11 +578,11 @@ body.modal-open {
 .investment-card {
     position: relative;
     cursor: pointer;
-    padding: 24px;
-    border-radius: 14px;
+    padding: 22px 24px;
+    border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
 
 .investment-card:hover {
@@ -616,16 +616,24 @@ body.modal-open {
 }
 
 .investment-card__ticker {
-    font-size: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2px 8px;
-    border-radius: 6px;
-    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary-bg);
+    border: 1px solid var(--color-primary-border);
+    color: var(--color-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .investment-card__type {
     font-size: 0.8rem;
-    opacity: 0.7;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 2px;
 }
 
 .inv-chip-row {
@@ -642,7 +650,7 @@ body.modal-open {
     padding: 5px 11px;
     border-radius: var(--radius-pill, 999px);
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
 }
 
@@ -670,21 +678,52 @@ body.modal-open {
     font-variant-numeric: tabular-nums;
 }
 
+.inv-pct-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill, 999px);
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+}
+
+.inv-pct-badge--up {
+    background: var(--color-income-bg, rgba(92, 208, 137, 0.09));
+    color: var(--color-income, #5cd089);
+    border: 1px solid var(--color-income-border, rgba(92, 208, 137, 0.22));
+}
+
+.inv-pct-badge--down {
+    background: var(--color-expense-bg, rgba(239, 110, 110, 0.09));
+    color: var(--color-expense, #ef6e6e);
+    border: 1px solid var(--color-expense-border, rgba(239, 110, 110, 0.22));
+}
+
 .investment-card__values {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 16px;
+    padding: 4px 0;
 }
 
 .investment-card__values .value-label {
     display: block;
-    font-size: 0.75rem;
-    opacity: 0.65;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
 }
 
 .investment-card__values .value {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 .investment-card__footer {
@@ -698,8 +737,8 @@ body.modal-open {
 }
 
 .investment-card__quote-info {
-    font-size: 0.8rem;
-    opacity: 0.7;
+    font-size: 0.78rem;
+    color: var(--text-dim);
 }
 
 .investment-card__actions {
@@ -808,26 +847,38 @@ body.modal-open {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 16px;
-    padding: 20px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 28px 32px;
+    border-radius: var(--radius-lg);
+    background-color: var(--glass-bg);
+    border-top: 1px solid var(--glass-border-top);
+    border-bottom: 1px solid var(--glass-border-bottom);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-blur);
 }
 
 .hero-stat .stat-label {
-    font-size: 0.85rem;
-    opacity: 0.7;
-    margin: 0 0 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 6px;
 }
 
 .hero-stat .stat-value {
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 1.6rem;
+    font-weight: 700;
     margin: 0;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 .text-negative {
     color: #e74c3c !important;
+}
+
+.text-positive {
+    color: var(--color-income) !important;
 }
 
 .button-glass--minimal {
@@ -903,6 +954,10 @@ body.modal-open {
 }
 
 @media (max-width: 480px) {
+    .hero-card {
+        padding: 20px 16px;
+    }
+
     .detail-hero__card {
         padding: 20px 16px;
     }
