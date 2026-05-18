@@ -10,41 +10,50 @@
 {% block content %}
 <main class="main-content">
 <div class="budget-container">
+    
     <div class="budget-hero">
-        <span class="budget-hero__label">Total gasto este mês</span>
-        <p class="budget-hero__amount {% if percent >= 100 %}stat-value--expense{% else %}stat-value--income{% endif %}">
-            R$ {{ total|floatformat:2 }}
+        <span class="budget-hero__label">Meus Orçamentos</span>
+        <p class="budget-hero__amount stat-value--income">
+            Por Categoria
         </p>
     </div>
 
     <div class="budget-progress-section">
-        {% if budget %}
-            <div class="budget-progress__container">
+        {% for budget in budgets %}
+            <div class="budget-progress__container" style="margin-bottom: 32px;">
                 <div class="budget-progress__info">
-                    <span class="budget-hero__label">Limite: R$ {{ budget.limit|floatformat:2 }}</span>
-                    <span class="budget-progress__percent">{{ percent|floatformat:1 }}%</span>
+                    <span class="budget-hero__label">
+                        <strong style="font-size: 1.1em; color: #fff;">{{ budget.category.name }}</strong> 
+                        <span style="opacity: 0.7; margin-left: 8px;">(Limite: R$ {{ budget.limit|floatformat:2 }})</span>
+                    </span>
+                    <span class="budget-progress__percent">{{ budget.percent|floatformat:1 }}%</span>
+                </div>
+                
+                <div style="font-size: 0.9em; margin-bottom: 8px; opacity: 0.8;">
+                    Gasto Realizado: R$ {{ budget.total|floatformat:2 }}
                 </div>
                 
                 <div class="budget-progress__bar-bg">
-                    <div class="budget-progress__bar-fill {% if percent >= 100 %}bg-danger{% elif percent >= 80 %}bg-warning{% else %}bg-success{% endif %}" 
-                         style="width: {% if percent > 100 %}100{% else %}{{ percent }}{% endif %}%;">
+                    <div class="budget-progress__bar-fill {% if budget.percent >= 100 %}bg-danger{% elif budget.percent >= 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                         style="width: {% if budget.percent > 100 %}100{% else %}{{ budget.percent|stringformat:'s' }}{% endif %}%;">
                     </div>
                 </div>
             </div>
             
-            {% if percent >= 80 %}
-                <p class="budget-status-msg {% if percent >= 100 %}color-danger{% else %}color-warning{% endif %}">
-                    {% if percent >= 100 %}Limite ultrapassado!{% else %}Você atingiu 80% do seu limite mensal.{% endif %}
+            {% if budget.percent >= 80 %}
+                <p class="budget-status-msg {% if budget.percent >= 100 %}color-danger{% else %}color-warning{% endif %}" style="margin-top: -16px; margin-bottom: 32px;">
+                    {% if budget.percent >= 100 %}Limite ultrapassado em {{ budget.category.name }}!{% else %}Você atingiu 80% do seu limite mensal em {{ budget.category.name }}.{% endif %}
                 </p>
             {% endif %}
-        {% else %}
-            <p class="tx-empty">Você ainda não definiu um limite para este mês.</p>
-        {% endif %}
+        {% empty %}
+            <p class="tx-empty">Você ainda não definiu nenhum orçamento por categoria para este mês.</p>
+        {% endfor %}
 
         <center>
-        <a href="{% url 'budget:set_budget' %}" class="button-glass" style="margin-top: 32px">
-            {% if budget %}Alterar limite do mês{% else %}Definir primeiro limite{% endif %}
-        </a>
+            <a href="{% url 'budget:set_budget' %}" class="button-glass" style="margin-top: 32px">
+                + Configurar Orçamento
+            </a>
+        </center>
     </div>
 </div>
 </main>

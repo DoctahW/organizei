@@ -40,9 +40,15 @@ def _build_create_transaction_context(user, form_data=None, errors=None):
 def create_category(request):
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
+        
         if name and name.lower() != Category.SUBSCRIPTION_CATEGORY_NAME.lower():
             Category.objects.create(name=name, user=request.user)
+        
+        if request.GET.get('next') == 'budget':
+            return redirect('budget:set_budget')
+            
         return redirect('transactions:create_transaction')
+        
     return render(request, 'transactions/create_category.html')
 
 
