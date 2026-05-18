@@ -180,6 +180,9 @@ Algumas dessas issues inclui a melhora de alguma funcionalidade do sistema e alg
 <img width="2286" height="561" alt="screenshot-2026-04-27_19-50-32" src="https://github.com/user-attachments/assets/cf5d14cc-6cf1-47ef-8646-5726f38aadf4" />
 
 </details>
+
+---
+
 <details>
 <summary><h2>Entrega 04 ✅ — 18/05/2026</h2></summary>
 
