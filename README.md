@@ -242,6 +242,7 @@ Nesta entrega, optamos por não utilizar a programação em par como nas outras 
       <td align="center" valign="top" width="14.28%"><a href="https://larissagiovanna.github.io/LarissaGiovanna/"><img src="https://avatars.githubusercontent.com/u/143462771?v=4?s=100" width="100px;" alt="Larissa Giovanna"/><br /><sub><b>Larissa Giovanna</b></sub></a><br /><a href="https://github.com/DoctahW/organizei/commits?author=LarissaGiovanna" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/RiosGabri"><img src="https://avatars.githubusercontent.com/u/222075163?v=4?s=100" width="100px;" alt="Gabriel Parméra"/><br /><sub><b>Gabriel Parméra</b></sub></a><br /><a href="https://github.com/DoctahW/organizei/commits?author=RiosGabri" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/DoctahW"><img src="https://avatars.githubusercontent.com/u/100718374?v=4?s=100" width="100px;" alt="João Euclides"/><br /><sub><b>João Euclides</b></sub></a><br /><a href="https://github.com/DoctahW/organizei/commits?author=DoctahW" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/felipeassiss"><img src="https://avatars.githubusercontent.com/u/169077824?v=4?s=100" width="100px;" alt="Felipe Assis"/><br /><sub><b>Felipe Assis</b></sub></a><br /><a href="https://github.com/felipeassiss/organizei/commits?author=felipeassiss" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
