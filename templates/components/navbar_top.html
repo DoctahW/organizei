@@ -11,7 +11,7 @@
             Painel
         </a>
         <a href="{% url 'transactions:list' %}" class="button-glass {% if request.resolver_match.namespace == 'transactions' %}button-glass--active{% endif %}">
-            Minha Carteira
+            Transações
         </a>
         <a href="{% url 'goals:list' %}" class="button-glass {% if request.resolver_match.namespace == 'goals' %}button-glass--active{% endif %}" {% if request.resolver_match.namespace == 'goals' %}aria-current="page"{% endif %}>
             Objetivos
@@ -19,7 +19,7 @@
         <a href="{% url 'budget:list' %}" class="button-glass {% if request.resolver_match.namespace == 'budget' %}button-glass--active{% endif %}" {% if request.resolver_match.namespace == 'budget' %}aria-current="page"{% endif %}>
             Orçamentos
         </a>
-        <a href="{% url 'subscriptions:manage_subscriptions' %}" class="button-glass">Assinaturas</a>
+        <a href="{% url 'investments:list' %}" class="button-glass {% if request.resolver_match.namespace == 'investments' %}button-glass--active{% endif %}" {% if request.resolver_match.namespace == 'investments' %}aria-current="page"{% endif %}>Investimentos</a>
         </nav>
 
         <div class="navbar__actions">

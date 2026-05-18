@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cadastro Manual — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/investments/investments.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+  <div class="form-page">
+    <header class="form-header">
+      <a href="{% url 'investments:register' %}" class="form-header__back">&#8249;</a>
+      <h1 class="form-header__title">Cadastro Manual</h1>
+      <span class="form-header__spacer"></span>
+    </header>
+
+    <form method="post" class="form-body">
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="id_nome">Nome do investimento</label>
+        <input type="text" name="nome" id="id_nome" placeholder="Ex.: Tesouro Selic 2029" value="{{ data.nome }}" required>
+        {% if errors.nome %}<span class="field-error">{{ errors.nome }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_tipo">Tipo</label>
+        <select name="tipo" id="id_tipo" required>
+          <option value="">Selecione...</option>
+          <option value="fundo" {% if data.tipo == "fundo" %}selected{% endif %}>Fundo de Investimento</option>
+          <option value="outro" {% if data.tipo == "outro" %}selected{% endif %}>Outro</option>
+        </select>
+        {% if errors.tipo %}<span class="field-error">{{ errors.tipo }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_valor_aplicado">Quanto você investiu (R$)</label>
+        <input type="number" name="valor_aplicado" id="id_valor_aplicado" step="0.01" min="0" placeholder="Ex.: 1000,00" value="{{ data.valor_aplicado }}" required>
+        <small class="field-hint">Valor que saiu do seu bolso quando você fez a aplicação.</small>
+        {% if errors.valor_aplicado %}<span class="field-error">{{ errors.valor_aplicado }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_valor_atual">Quanto vale hoje (R$)</label>
+        <input type="number" name="valor_atual" id="id_valor_atual" step="0.01" min="0" placeholder="Ex.: 1080,50" value="{{ data.valor_atual }}" required>
+        <small class="field-hint">Saldo atual do investimento. Se você acabou de aplicar, repita o mesmo valor.</small>
+        {% if errors.valor_atual %}<span class="field-error">{{ errors.valor_atual }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_data_aplicacao">Data da aplicação</label>
+        <input type="date" name="data_aplicacao" id="id_data_aplicacao" value="{{ data.data_aplicacao }}" required>
+        {% if errors.data_aplicacao %}<span class="field-error">{{ errors.data_aplicacao }}</span>{% endif %}
+      </div>
+
+      <button type="submit" class="btn-submit">Cadastrar Investimento</button>
+    </form>
+  </div>
+</main>
+{% endblock %}

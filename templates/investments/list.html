@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Investimentos — Organizei{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/investments/investments.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+
+  {% if messages %}
+  <div class="messages-container" role="alert">
+    {% for message in messages %}
+    <div class="message message--{{ message.tags|default:'info' }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="detail-hero">
+    <div class="detail-hero__card glass">
+      <p class="detail-hero__label">VALOR ATUAL</p>
+      <p class="detail-hero__value">R$ {{ total_atual|floatformat:2 }}</p>
+      <p class="detail-hero__sub detail-hero__sub--green">Aplicado R$ {{ total_aplicado|floatformat:2 }}</p>
+    </div>
+    <div class="detail-hero__card glass">
+      <p class="detail-hero__label">RENDIMENTO</p>
+      <p class="detail-hero__value {% if rendimento_total >= 0 %}detail-hero__value--positive{% else %}detail-hero__value--negative{% endif %}">
+        {% if rendimento_total >= 0 %}+{% endif %}R$ {{ rendimento_total|floatformat:2 }}
+      </p>
+      <div class="detail-hero__meta">
+        <span class="detail-hero__badge {% if rendimento_total >= 0 %}detail-hero__badge--positive{% else %}detail-hero__badge--negative{% endif %}">
+          {% if rendimento_total >= 0 %}+{% endif %}{{ rentabilidade_total }}%
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h1 class="section-header__title">Meus Investimentos</h1>
+    <a href="{% url 'investments:register' %}" class="button-glass">+ Novo Investimento</a>
+  </div>
+
+  <div class="investments-list">
+    {% for inv in investimentos %}
+    <div class="investment-card glass">
+      <a href="{% url 'investments:detail' inv.pk %}" class="investment-card__link" aria-label="Ver detalhes de {{ inv.nome }}"></a>
+      <div class="investment-card__header">
+        <div>
+          <h2 class="investment-card__name">
+            {{ inv.nome }}
+            {% if inv.ticker and not inv.tipo == "tesouro" %}<span class="investment-card__ticker">{{ inv.ticker }}</span>{% endif %}
+          </h2>
+          <span class="investment-card__type">{{ inv.get_tipo_display }}</span>
+        </div>
+        <span class="inv-pct-badge {% if inv.rendimento >= 0 %}inv-pct-badge--up{% else %}inv-pct-badge--down{% endif %}">
+          {% if inv.rendimento >= 0 %}+{% endif %}{{ inv.rentabilidade_pct }}%
+        </span>
+      </div>
+
+      <div class="investment-card__values">
+        <div>
+          <span class="value-label">Aplicado</span>
+          <span class="value">R$ {{ inv.valor_aplicado|floatformat:2 }}</span>
+        </div>
+        <div>
+          <span class="value-label">Atual</span>
+          <span class="value">R$ {{ inv.valor_atual|floatformat:2 }}</span>
+        </div>
+        <div>
+          <span class="value-label">Rendimento</span>
+          <span class="value {% if inv.rendimento >= 0 %}text-positive{% else %}text-negative{% endif %}">
+            R$ {{ inv.rendimento|floatformat:2 }}
+          </span>
+        </div>
+      </div>
+
+      <div class="investment-card__footer">
+        <span class="investment-card__quote-info">
+          {% if inv.pu_atual %}
+            {% if inv.tipo == "tesouro" %}
+              PU R$ {{ inv.pu_atual|floatformat:4 }}
+            {% else %}
+              R$ {{ inv.pu_atual|floatformat:2 }}
+            {% endif %}
+            {% if inv.cotacao_atualizada_em %}
+              · {{ inv.cotacao_atualizada_em|date:"d/m/Y H:i" }}
+            {% endif %}
+          {% else %}
+            {% if inv.data_aplicacao %}
+              Aplicado em {{ inv.data_aplicacao|date:"d/m/Y" }}
+            {% endif %}
+          {% endif %}
+        </span>
+        <div class="investment-card__actions">
+          {% if inv.ticker %}
+          <form method="POST" action="{% url 'investments:update_quote' inv.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="button-glass button-glass--minimal" title="Atualizar cotação">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="vertical-align:middle"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="investments-empty">
+      <p>Você ainda não possui investimentos cadastrados.</p>
+      <a href="{% url 'investments:register' %}" class="button-glass">Cadastrar meu primeiro investimento</a>
+    </div>
+    {% endfor %}
+  </div>
+
+</main>
+{% endblock %}
