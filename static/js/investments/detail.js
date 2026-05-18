@@ -81,51 +81,50 @@
   }
 
   function renderLegend(data) {
-    const last = data.points[data.points.length - 1];
-    const first = data.points[0];
-    const variacaoAbs = last.valor - last.custo;
-    const variacaoPct = last.custo > 0 ? (variacaoAbs / last.custo) * 100 : 0;
-    const sinal = variacaoAbs >= 0 ? "+" : "";
+    var last = data.points[data.points.length - 1];
+    var first = data.points[0];
+    var variacaoAbs = last.valor - last.custo;
+    var variacaoPct = last.custo > 0 ? (variacaoAbs / last.custo) * 100 : 0;
+    var sinal = variacaoAbs >= 0 ? "+" : "";
+    var variacaoColor = variacaoAbs >= 0 ? "#5cd089" : "#ef6e6e";
+
     legendEl.innerHTML = "";
 
-    const item = function (cor, label, valor) {
-      const span = document.createElement("span");
-      span.className = "legend-item";
-      span.innerHTML =
-        '<span class="legend-swatch" style="background:' +
-        cor +
-        '"></span>' +
-        "<strong>" +
-        label +
-        ":</strong> " +
-        valor;
-      return span;
-    };
+    // Custo (muted line)
+    var custoItem = document.createElement("span");
+    custoItem.className = "legend-item";
+    custoItem.innerHTML =
+      '<span class="legend-swatch" style="background:rgba(255,255,255,0.35)"></span>' +
+      '<span class="legend-label">Custo</span> ' +
+      '<span class="legend-value">' + fmtBR(last.custo) + '</span>';
+    legendEl.appendChild(custoItem);
 
-    legendEl.appendChild(
-      item("rgba(255,255,255,0.5)", "Custo (aplicado)", fmtBR(last.custo)),
-    );
-    legendEl.appendChild(item("#2ecc71", "Valor atual", fmtBR(last.valor)));
-    const variacaoEl = item(
-      variacaoAbs >= 0 ? "#2ecc71" : "#e74c3c",
-      "Variação",
-      sinal + fmtBR(variacaoAbs) + " (" + sinal + variacaoPct.toFixed(2) + "%)",
-    );
-    legendEl.appendChild(variacaoEl);
+    // Valor atual (green line)
+    var valorItem = document.createElement("span");
+    valorItem.className = "legend-item";
+    valorItem.innerHTML =
+      '<span class="legend-swatch" style="background:#5cd089"></span>' +
+      '<span class="legend-label">Valor atual</span> ' +
+      '<span class="legend-value">' + fmtBR(last.valor) + '</span>';
+    legendEl.appendChild(valorItem);
 
+    // Variação (colored)
+    var variacaoItem = document.createElement("span");
+    variacaoItem.className = "legend-item";
+    variacaoItem.innerHTML =
+      '<span class="legend-swatch" style="background:' + variacaoColor + '"></span>' +
+      '<span class="legend-label">Variação</span> ' +
+      '<span class="legend-value" style="color:' + variacaoColor + '">' +
+      sinal + fmtBR(variacaoAbs) +
+      '</span>';
+    legendEl.appendChild(variacaoItem);
+
+    // Note
     if (data.tipo === "esparso") {
-      const note = document.createElement("p");
+      var note = document.createElement("p");
       note.className = "historico-note";
       note.textContent =
         "Sem cotação histórica disponível para este ativo — mostrando apenas pontos de movimentação.";
-      legendEl.appendChild(note);
-    } else {
-      const note = document.createElement("p");
-      note.className = "historico-note";
-      note.textContent =
-        "Série baseada no PU oficial de venda do Tesouro Direto desde " +
-        new Date(first.date).toLocaleDateString("pt-BR") +
-        ".";
       legendEl.appendChild(note);
     }
   }
