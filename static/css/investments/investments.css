@@ -767,16 +767,16 @@ body.modal-open {
 }
 
 .register-copy {
-    opacity: 0.5;
-    margin-top: -20px;
-    font-size: small;
-    margin-left: 5px;
+    opacity: 0.6;
+    margin: -12px 0 0;
+    font-size: 0.9rem;
 }
 
 .register-options {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 12px;
 }
 
 .register-option {
@@ -816,6 +816,174 @@ body.modal-open {
     max-width: 560px;
     margin: 0 auto;
     padding: 20px;
+}
+
+.investments-register-page,
+.investments-form-page {
+    align-items: center;
+    padding: 24px 64px 88px;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 1160px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 720px;
+}
+
+.form-card {
+    border-radius: var(--radius-lg);
+    padding: 32px;
+}
+
+.form-card .register-lede {
+    margin-bottom: 22px;
+}
+
+@media (max-width: 900px) {
+    .investments-form-page {
+        padding: 24px 20px 88px;
+    }
+
+    .form-card {
+        padding: 22px;
+    }
+}
+
+.page-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.back-link {
+    display: inline-block;
+    width: 32px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.register-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #f5f5f5;
+    margin: 0;
+}
+
+.register-card {
+    border-radius: var(--radius-lg);
+    padding: 32px;
+}
+
+.register-subtitle {
+    font-size: 30px;
+    margin: 0 0 10px;
+    color: #f5f5f5;
+    text-align: center;
+}
+
+.register-lede {
+    max-width: 640px;
+    margin: 0 auto 26px;
+    color: #b8b8bd;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.register-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.register-card-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    min-height: 220px;
+    padding: 28px 24px;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-primary);
+    background-color: var(--glass-bg);
+    border-top: 1px solid var(--glass-border-top);
+    border-bottom: 1px solid var(--glass-border-bottom);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.register-card-option:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.register-card-option__title {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.register-card-option__text {
+    max-width: 34ch;
+    color: #b8b8bd;
+    font-size: 14.5px;
+    line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+    .investments-register-page {
+        padding: 24px 20px 88px;
+    }
+
+    .register-title {
+        font-size: 28px;
+    }
+
+    .register-subtitle {
+        font-size: 24px;
+    }
+
+    .register-card {
+        padding: 22px;
+    }
+
+    .register-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .register-card-option {
+        min-height: auto;
+        padding: 22px;
+    }
+
+    .page-title-row {
+        position: relative;
+        justify-content: center;
+    }
+
+    .page-title-row .back-link {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .page-title-row .register-title {
+        text-align: center;
+    }
 }
 
 .form-header {

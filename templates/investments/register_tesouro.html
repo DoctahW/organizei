@@ -8,20 +8,20 @@
 {% endblock %}
 
 {% block content %}
-<main class="main-content">
-  <div class="form-page">
-    <header class="form-header">
-      <a href="{% url 'investments:register' %}" class="form-header__back">&#8249;</a>
-      <h1 class="form-header__title">Tesouro Direto</h1>
-      <span class="form-header__spacer"></span>
-    </header>
+<main class="main-content investments-form-page">
+  <div class="form-container">
+    <div class="page-title-row">
+      <a href="{% url 'investments:register' %}" class="back-link" aria-label="Voltar">&#8249;</a>
+      <h1 class="register-title">Tesouro Direto</h1>
+    </div>
 
-    <p class="register-copy">
-      Lista atualizada com os títulos disponíveis para resgate (dado oficial
-      do Tesouro Transparente, sincronizado diariamente).
-    </p>
+    <div class="form-card glass">
+      <p class="register-lede">
+        Lista atualizada com os títulos disponíveis para resgate (dado oficial
+        do Tesouro Transparente, sincronizado diariamente).
+      </p>
 
-    <form method="post" class="form-body">
+      <form method="post" class="form-body">
       {% csrf_token %}
 
       <div class="field">
@@ -58,8 +58,9 @@
         {% if errors.data_aplicacao %}<span class="field-error">{{ errors.data_aplicacao }}</span>{% endif %}
       </div>
 
-      <button type="submit" class="btn-submit">Cadastrar e Buscar PU</button>
-    </form>
+        <button type="submit" class="btn-submit">Cadastrar e Buscar PU</button>
+      </form>
+    </div>
   </div>
 </main>
 

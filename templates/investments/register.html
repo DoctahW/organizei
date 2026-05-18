@@ -8,40 +8,45 @@
 {% endblock %}
 
 {% block content %}
-<main class="main-content">
-  <div class="form-page">
-    <header class="form-header">
-      <a href="{% url 'investments:list' %}" class="form-header__back">&#8249;</a>
-      <h1 class="form-header__title">Novo Investimento</h1>
-      <span class="form-header__spacer"></span>
-    </header>
+<main class="main-content investments-register-page">
+  <div class="register-container">
+    <div class="page-title-row">
+      <a href="{% url 'investments:list' %}" class="back-link" aria-label="Voltar">&#8249;</a>
+      <h1 class="register-title">Novo Investimento</h1>
+    </div>
 
-    <p class="register-copy">Como deseja cadastrar?</p>
+    <div class="register-card glass">
+      <h2 class="register-subtitle">Como deseja cadastrar?</h2>
+      <p class="register-lede">
+        Escolha o tipo de ativo. Ações, FIIs e Tesouro Direto têm cotação
+        atualizada automaticamente — fundos e demais ativos entram em modo manual.
+      </p>
 
-    <div class="register-options">
-      <a href="{% url 'investments:create_auto' %}" class="register-option glass">
-        <h2 class="register-option__title">Ações & FIIs</h2>
-        <p class="register-option__text">
-          Para ações, FIIs e criptos da B3. Informe ticker e quantidade —
-          buscamos a cotação atual na BRAPI e calculamos seu rendimento sozinhos.
-        </p>
-      </a>
+      <div class="register-grid">
+        <a href="{% url 'investments:create_auto' %}" class="register-card-option">
+          <span class="register-card-option__title">Ações &amp; FIIs</span>
+          <span class="register-card-option__text">
+            Para ações, FIIs e criptos da B3. Informe ticker e quantidade —
+            buscamos a cotação atual na BRAPI e calculamos seu rendimento.
+          </span>
+        </a>
 
-      <a href="{% url 'investments:create_tesouro' %}" class="register-option glass">
-        <h2 class="register-option__title">Tesouro Direto</h2>
-        <p class="register-option__text">
-          Tesouro Selic, Prefixado, IPCA+, Renda+ e Educa+. Escolha o título
-          numa lista oficial atualizada diariamente pelo Tesouro Nacional.
-        </p>
-      </a>
+        <a href="{% url 'investments:create_tesouro' %}" class="register-card-option">
+          <span class="register-card-option__title">Tesouro Direto</span>
+          <span class="register-card-option__text">
+            Tesouro Selic, Prefixado, IPCA+, Renda+ e Educa+. Escolha o título
+            numa lista oficial atualizada diariamente pelo Tesouro Nacional.
+          </span>
+        </a>
 
-      <a href="{% url 'investments:create_manual' %}" class="register-option glass">
-        <h2 class="register-option__title">Manual</h2>
-        <p class="register-option__text">
-          Para fundos e outros ativos sem cotação pública. Você informa o
-          valor aplicado e o valor atual — sem consulta automática.
-        </p>
-      </a>
+        <a href="{% url 'investments:create_manual' %}" class="register-card-option">
+          <span class="register-card-option__title">Manual</span>
+          <span class="register-card-option__text">
+            Para fundos e outros ativos sem cotação pública. Você informa o
+            valor aplicado e o valor atual — sem consulta automática.
+          </span>
+        </a>
+      </div>
     </div>
   </div>
 </main>
