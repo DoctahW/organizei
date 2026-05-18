@@ -37,11 +37,11 @@
     <span class="tab-item__label">Orçamentos</span>
   </a>
 
-  <a href="{% url 'subscriptions:manage_subscriptions' %}" class="tab-item">
+  <a href="{% url 'investments:list' %}" class="tab-item {% if request.resolver_match.namespace == 'investments' %}tab-item--active{% endif %}" {% if request.resolver_match.namespace == 'investments' %}aria-current="page"{% endif %}>
     <svg class="tab-item__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
     </svg>
-    <span class="tab-item__label">Assinaturas</span>
+    <span class="tab-item__label">Investimentos</span>
   </a>
 
 </nav>
