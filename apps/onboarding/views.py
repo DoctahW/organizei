@@ -369,7 +369,7 @@ def step_subscription(request):
             start_date_input = (
                 datetime.strptime(start_date_raw, "%Y-%m-%d").date()
                 if start_date_raw
-                else date.today()
+                else date_cls.today()
             )
         except ValueError:
             start_date_input = None
