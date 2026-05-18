@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import sys
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
@@ -178,3 +179,10 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
+
+if 'test' in sys.argv:
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }

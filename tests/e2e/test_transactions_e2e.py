@@ -111,25 +111,25 @@ class TransactionsE2ETest(E2EBaseTest):
         Select(
             self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
         ).select_by_value("DEPOSIT")
-        
+
         long_name = "A" * 151
-        
+
         self.driver.execute_script(
             "document.getElementById('name-input').removeAttribute('maxlength');"
         )
-        
+
         name_input = self.driver.find_element(By.ID, "name-input")
         name_input.clear()
         name_input.send_keys(long_name)
-        
+
         self.driver.execute_script(
             "document.getElementById('selected-category').value = '';"
         )
-        
+
         self.driver.execute_script(
             "document.getElementById('value-input').value = '100.00';"
         )
-        
+
         self.driver.find_element(By.ID, "sent-transaction-btn").click()
 
         self.wait().until(
@@ -139,3 +139,125 @@ class TransactionsE2ETest(E2EBaseTest):
         )
         body_text = self.driver.find_element(By.TAG_NAME, "body").text
         self.assertIn("O nome deve ter no máximo 150 caracteres", body_text)
+
+    def test_edit_transaction_shows_date_and_launch_type(self):
+        """Editing a transaction shows date and launch type (Único/Recorrente) fields."""
+        # Create a transaction first via API/model to avoid UI navigation complexity
+        from apps.transactions.models import Transaction
+        from django.urls import reverse
+
+        tx = Transaction.objects.create(
+            user=self.user,
+            name="Test Transaction",
+            transaction_type="WITHDRAWAL",
+            value=100.00,
+        )
+
+        # Navigate directly to edit page using URL reverse
+        edit_url = reverse('transactions:update', kwargs={'pk': tx.pk})
+        self.driver.get(self.live_server_url + edit_url)
+
+        # Wait for edit page to load
+        self.wait().until(
+            EC.presence_of_element_located((By.ID, "date-input"))
+        )
+
+        # Verify date field is present and editable
+        date_input = self.driver.find_element(By.ID, "date-input")
+        self.assertIsNotNone(date_input)
+        self.assertTrue(date_input.get_attribute("type") == "date")
+
+        # Verify launch type radio buttons are present
+        radio_buttons = self.driver.find_elements(By.NAME, "is_fixed")
+        self.assertEqual(len(radio_buttons), 2, "Should have 2 radio buttons for launch type")
+
+        # Verify radio button values
+        values = [btn.get_attribute("value") for btn in radio_buttons]
+        self.assertIn("off", values)
+        self.assertIn("on", values)
+
+        # Verify radio button labels exist in page
+        body_text = self.driver.find_element(By.TAG_NAME, "body").text
+        self.assertIn("Tipo de Lançamento", body_text)
+        self.assertIn("Único", body_text)
+        self.assertIn("Recorrente", body_text)
+
+    def test_category_modal_hides_date_and_launch_type(self):
+        """Opening category modal hides date and launch type fields."""
+        self.goto("transactions:create_transaction")
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
+        ).select_by_value("WITHDRAWAL")
+
+        name_input = self.driver.find_element(By.ID, "name-input")
+        name_input.clear()
+        name_input.send_keys("Test Transaction")
+
+        self.driver.execute_script(
+            "document.getElementById('selected-category').value = '';"
+        )
+        self.driver.execute_script(
+            "document.getElementById('value-input').value = '100.00';"
+        )
+
+        # Verify date and launch type are visible before opening modal
+        date_container = self.driver.find_element(By.CLASS_NAME, "choose-date-container")
+        recurring_container = self.driver.find_element(By.CLASS_NAME, "recurring-container")
+
+        self.assertEqual(date_container.value_of_css_property("display"), "block")
+        self.assertIn(recurring_container.value_of_css_property("display"), ["block", "flex"])
+
+        # Open category modal
+        self.driver.find_element(By.ID, "category-btn").click()
+
+        # Wait for modal to be visible
+        self.wait().until(
+            EC.presence_of_element_located((By.ID, "category-modal"))
+        )
+
+        # Verify date and launch type are hidden
+        self.assertEqual(date_container.value_of_css_property("display"), "none")
+        self.assertEqual(recurring_container.value_of_css_property("display"), "none")
+
+    def test_category_selection_shows_date_and_launch_type(self):
+        """Selecting a category shows date and launch type fields again."""
+        self.goto("transactions:create_transaction")
+        Select(
+            self.driver.find_element(By.CSS_SELECTOR, "select[name=transaction_type]")
+        ).select_by_value("WITHDRAWAL")
+
+        name_input = self.driver.find_element(By.ID, "name-input")
+        name_input.clear()
+        name_input.send_keys("Test Transaction")
+
+        self.driver.execute_script(
+            "document.getElementById('selected-category').value = '';"
+        )
+        self.driver.execute_script(
+            "document.getElementById('value-input').value = '100.00';"
+        )
+
+        # Get containers
+        date_container = self.driver.find_element(By.CLASS_NAME, "choose-date-container")
+        recurring_container = self.driver.find_element(By.CLASS_NAME, "recurring-container")
+
+        # Open category modal
+        self.driver.find_element(By.ID, "category-btn").click()
+
+        # Wait for modal to be visible
+        self.wait().until(
+            EC.presence_of_element_located((By.ID, "category-modal"))
+        )
+
+        # Verify fields are hidden
+        self.assertEqual(date_container.value_of_css_property("display"), "none")
+        self.assertEqual(recurring_container.value_of_css_property("display"), "none")
+
+        # Select first category
+        categories = self.driver.find_elements(By.CLASS_NAME, "modal-option")
+        if categories:
+            categories[0].click()
+
+            # Verify fields are visible again
+            self.assertIn(date_container.value_of_css_property("display"), ["block", "flex"])
+            self.assertIn(recurring_container.value_of_css_property("display"), ["block", "flex"])

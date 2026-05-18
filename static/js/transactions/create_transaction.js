@@ -27,6 +27,10 @@ const transactionTypeSelect = document.querySelector('.transaction_type_select')
 const sentTransactionBtn = document.querySelector('#sent-transaction-btn');
 const addNewCategoryContainer = document.querySelector('.add-new-category-container');
 const backBtn = document.getElementById('back_button');
+const dateContainer = document.querySelector('.choose-date-container'); 
+const recurringContainer = document.querySelector('.recurring-container');
+const contaSelect = document.querySelector('select[name="conta_id"]');
+const categoryLabel = document.querySelector('label[for="selected-category"]');
 
 
 function closeCategoryModal() {
@@ -41,6 +45,10 @@ function closeCategoryModal() {
         transactionTypeSelect ? transactionTypeSelect.style.display = 'block' : null;
         sentTransactionBtn ? sentTransactionBtn.style.display = 'block' : null;
         addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
+        dateContainer ? dateContainer.style.display = 'flex' : null;
+        recurringContainer ? recurringContainer.style.display = 'block' : null;
+        contaSelect ? contaSelect.style.display = 'block' : null;
+        categoryLabel ? categoryLabel.style.display = 'block' : null;
     }
 };
 
@@ -58,6 +66,10 @@ function openCategoryModal() {
         transactionTypeSelect ? transactionTypeSelect.style.display = 'none' : null;
         sentTransactionBtn ? sentTransactionBtn.style.display = 'none' : null;
         addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
+        dateContainer ? dateContainer.style.display = 'none' : null;
+        recurringContainer ? recurringContainer.style.display = 'none' : null;
+        contaSelect ? contaSelect.style.display = 'none' : null;
+        categoryLabel ? categoryLabel.style.display = 'none' : null;
     }
 
     if (pageTitle) {
@@ -65,7 +77,7 @@ function openCategoryModal() {
     }
 
     if (backBtn) {
-        backBtn.setAttribute('href', "javascript:closeCategory()")
+        backBtn.setAttribute('href', "javascript:closeCategoryModal()")
     }
 
 }
@@ -80,6 +92,10 @@ function selectCategory(categoryValue, categoryLabel) {
         transactionTypeSelect ? transactionTypeSelect.style.display = 'block' : null;
         sentTransactionBtn ? sentTransactionBtn.style.display = 'block' : null;
         addNewCategoryContainer ? addNewCategoryContainer.style.display = 'none' : null;
+        dateContainer ? dateContainer.style.display = 'flex' : null;
+        recurringContainer ? recurringContainer.style.display = 'block' : null;
+        contaSelect ? contaSelect.style.display = 'block' : null;
+        categoryLabel ? categoryLabel.style.display = 'block' : null;
     }
 
     const hiddenCategoryInput = document.getElementById('selected-category');
@@ -104,4 +120,56 @@ function openCreateCategory() {
         }
     }
     //add o restante
+}
+
+function setRecurring(isRecurring) {
+    const singleBtn = document.getElementById('single-btn');
+    const recurringBtn = document.getElementById('recurring-btn');
+    const hiddenInput = document.getElementById('is_fixed_input');
+
+    if (!hiddenInput || !singleBtn || !recurringBtn) return; // Segurança básica
+
+    if (isRecurring) {
+        // Estilo Recorrente
+        recurringBtn.style.backgroundColor = 'rgba(92, 208, 137, 0.09)';
+        recurringBtn.style.border = '1px solid #5cd089';
+        
+        // Reseta Único
+        singleBtn.style.backgroundColor = 'transparent';
+        singleBtn.style.border = '1px solid transparent'; // Simplifiquei aqui
+        singleBtn.style.borderTop = '1px solid var(--glass-border-top)';
+        singleBtn.style.borderBottom = '1px solid var(--glass-border-bottom)';
+
+        hiddenInput.value = 'on'; 
+    } else {
+        // Estilo Único
+        singleBtn.style.backgroundColor = 'rgba(92, 208, 137, 0.09)';
+        singleBtn.style.border = '1px solid #5cd089';
+        
+        // Reseta Recorrente
+        recurringBtn.style.backgroundColor = 'transparent';
+        recurringBtn.style.border = '1px solid transparent';
+        recurringBtn.style.borderTop = '1px solid var(--glass-border-top)';
+        recurringBtn.style.borderBottom = '1px solid var(--glass-border-bottom)';
+
+        hiddenInput.value = 'off';
+    }
+}
+
+// Vincula os botões à função assim que a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    const sBtn = document.getElementById('single-btn');
+    const rBtn = document.getElementById('recurring-btn');
+    if(sBtn) sBtn.onclick = () => setRecurring(false);
+    if(rBtn) rBtn.onclick = () => setRecurring(true);
+});
+
+window.setRecurring = setRecurring;
+
+const recurringSingleBtn = document.getElementById('single-btn');
+const recurringRecurringBtn = document.getElementById('recurring-btn');
+
+if (recurringSingleBtn && recurringRecurringBtn) {
+    recurringSingleBtn.addEventListener('click', () => setRecurring(false));
+    recurringRecurringBtn.addEventListener('click', () => setRecurring(true));
 }
