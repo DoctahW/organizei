@@ -21,15 +21,15 @@ class AccountsE2ETest(E2EBaseTest):
         self.create_user(username="validuser", password="correctpass")
 
         self.driver.get(f"{self.live_server_url}/accounts/login/")
-        self.wait().until(EC.presence_of_element_located((By.ID, "id_username")))
-        self.driver.find_element(By.ID, "id_username").send_keys("validuser")
-        self.driver.find_element(By.ID, "id_password").send_keys("wrongpass")
-        self.driver.find_element(By.CSS_SELECTOR, ".btn-login").click()
+        self.wait().until(EC.presence_of_element_located((By.ID, "login-username")))
+        self.driver.find_element(By.ID, "login-username").send_keys("validuser")
+        self.driver.find_element(By.ID, "login-password").send_keys("wrongpass")
+        self.driver.find_element(By.CSS_SELECTOR, "#login-panel .auth-form__btn").click()
 
         self.wait().until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".error-list"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".auth-errors"))
         )
-        error_text = self.driver.find_element(By.CSS_SELECTOR, ".error-list").text
+        error_text = self.driver.find_element(By.CSS_SELECTOR, ".auth-errors").text
         self.assertIn("inválidos", error_text.lower())
 
     def test_logout_redirects_to_login(self):
@@ -37,7 +37,9 @@ class AccountsE2ETest(E2EBaseTest):
         self.create_user()
         self.login_via_ui()
 
-        self.driver.get(f"{self.live_server_url}/accounts/logout/")
+        self.driver.find_element(
+            By.CSS_SELECTOR, ".navbar__logout-form button[type='submit']"
+        ).click()
 
         self.wait().until(EC.url_contains("/accounts/login/"))
         self.assertIn("/accounts/login/", self.driver.current_url)
