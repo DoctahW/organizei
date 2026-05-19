@@ -196,14 +196,11 @@ Foram selecionadas as últimas histórias presentes no backlog; 5 no total:
 
 ### Screencast com as histórias implementadas
 
-[Assistir no Youtube](#) 
+[Assistir no Youtube](https://youtu.be/iRQR18c-m9g) 
 
-#### Screencast testando as histórias implementadas via testes E2E:
+#### Screencast testando as histórias implementadas via testes E2E e processo de build CI/CD:
 
-[Assistir](#)
-
-#### Screencast mostrando o processo de build CI/CD:
-[Assistir](#)
+[Assistir no Youtube](https://youtu.be/sfAsQyS4KO8)
 
 ### JIRA - Sprint 03
 <img width="904" height="440" alt="image" src="https://github.com/user-attachments/assets/902d912c-8a09-43b2-9d47-9853d656d9a2" />
