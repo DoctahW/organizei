@@ -33,7 +33,7 @@ def noop(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("investments", "0007_investmentmovimentacao_taxa_na_data_and_more"),
+        ("investments", "0009_investmentmovimentacao_taxa_na_data_and_more"),
     ]
 
     operations = [

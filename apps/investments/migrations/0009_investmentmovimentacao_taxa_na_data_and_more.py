@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('investments', '0006_update_tesouro_names'),
+        ('investments', '0007_widen_ticker_max_length'),
     ]
 
     operations = [
