@@ -47,7 +47,12 @@ class Investment(models.Model):
         )
         self.quantidade = agg["qtd_compra"] - agg["qtd_venda"]
         self.valor_aplicado = agg["val_compra"] - agg["val_venda"]
-        if self.pu_atual is not None:
+        if self.tipo == "tesouro":
+            # Tesouro Direto: marcação na curva — o valor cresce de forma
+            # contínua à taxa contratada na compra e nunca decresce. Não
+            # usamos o PU de mercado (que oscila como uma ação).
+            self.valor_atual = self._valor_atual_curva()
+        elif self.pu_atual is not None:
             self.valor_atual = (self.quantidade * self.pu_atual).quantize(Decimal("0.01"))
         else:
             self.valor_atual = self.valor_aplicado
@@ -55,6 +60,44 @@ class Investment(models.Model):
         if primeira:
             self.data_aplicacao = primeira
         self.save(update_fields=["quantidade", "valor_aplicado", "valor_atual", "data_aplicacao"])
+
+    def _valor_atual_curva(self):
+        """Valor da posição de Tesouro Direto pela marcação na curva.
+
+        Cada compra é um lote que cresce isoladamente à taxa contratada
+        naquela data. Resgates consomem os lotes em ordem FIFO. O resultado
+        é monotônico (nunca cai), refletindo o rendimento contratado em vez
+        do preço de mercado.
+        """
+        from datetime import date as _date
+
+        from . import tesouro
+
+        hoje = _date.today()
+        lotes = []  # cada item: [qtd_restante, pu_compra, taxa, data]
+        for m in self.movimentacoes.order_by("data", "created_at"):
+            if m.tipo == "compra":
+                lotes.append([m.quantidade, m.pu_na_data, m.taxa_na_data, m.data])
+            else:
+                restante = m.quantidade
+                for lote in lotes:
+                    if restante <= 0:
+                        break
+                    consumido = min(lote[0], restante)
+                    lote[0] -= consumido
+                    restante -= consumido
+
+        total = Decimal("0")
+        for qtd, pu, taxa, data in lotes:
+            if qtd <= 0:
+                continue
+            if pu is None or taxa is None:
+                # Sem dados de curva (lote antigo): mantém o custo investido.
+                total += qtd * (pu or Decimal("0"))
+            else:
+                dias = (hoje - data).days
+                total += qtd * tesouro.pu_na_curva(pu, taxa, dias)
+        return total.quantize(Decimal("0.01"))
 
     @property
     def rendimento(self):
@@ -100,6 +143,7 @@ class TesouroPrecoHistorico(models.Model):
     data = models.DateField()
     pu_compra = models.DecimalField(max_digits=14, decimal_places=4)
     pu_venda = models.DecimalField(max_digits=14, decimal_places=4)
+    taxa_compra = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
 
     class Meta:
         unique_together = [("tipo", "vencimento", "data")]
@@ -118,6 +162,8 @@ class InvestmentMovimentacao(models.Model):
     valor = models.DecimalField(max_digits=14, decimal_places=2)
     quantidade = models.DecimalField(max_digits=14, decimal_places=4)
     pu_na_data = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
+    # Taxa anual (%) contratada na data — usada na marcação na curva do Tesouro.
+    taxa_na_data = models.DecimalField(max_digits=8, decimal_places=4, null=True, blank=True)
     observacao = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

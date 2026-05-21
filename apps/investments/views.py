@@ -1,4 +1,4 @@
-from datetime import date as date_cls
+from datetime import date as date_cls, timedelta
 from decimal import Decimal
 
 import requests
@@ -12,7 +12,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 
 from django.http import JsonResponse
 
-from .models import Investment, InvestmentMovimentacao, TesouroPrecoHistorico
+from .models import Investment, InvestmentMovimentacao
 from .services import (
     QUOTE_RATE_LIMIT_SECONDS,
     fetch_brapi_quote,
@@ -198,6 +198,7 @@ def investment_create_tesouro(request):
             try:
                 data_compra = date_cls.fromisoformat(data["data_aplicacao"])
                 pu_compra = tesouro.get_pu_on_date(tipo, vencimento, data_compra, side="venda")
+                taxa_compra = tesouro.get_taxa_on_date(tipo, vencimento, data_compra)
                 pu_atual = tesouro.get_current_pu(tipo, vencimento)
             except (ValueError, requests.RequestException) as exc:
                 errors["vencimento"] = f"Não foi possível buscar o PU do título: {exc}"
@@ -221,6 +222,7 @@ def investment_create_tesouro(request):
                         valor=valor_aplicado,
                         quantidade=quantidade,
                         pu_na_data=pu_compra,
+                        taxa_na_data=taxa_compra,
                         observacao=f"Compra inicial (PU da data: R$ {pu_compra})",
                     )
                     investimento.recalc()
@@ -273,6 +275,7 @@ def _add_movimentacao(request, pk, tipo_mov):
     tesouro_key = tesouro.parse_ticker(investimento.ticker)
     quantidade = None
     pu_na_data = None
+    taxa_na_data = None
 
     try:
         if tesouro_key:
@@ -280,6 +283,8 @@ def _add_movimentacao(request, pk, tipo_mov):
             side = "venda" if tipo_mov == "compra" else "compra"
             pu_na_data = tesouro.get_pu_on_date(tipo, vencimento, data_mov, side=side)
             quantidade = (valor / pu_na_data).quantize(Decimal("0.0001"))
+            if tipo_mov == "compra":
+                taxa_na_data = tesouro.get_taxa_on_date(tipo, vencimento, data_mov)
         elif investimento.ticker:
             # Ações/FIIs/cripto: usuário precisa informar a quantidade
             if not raw_qtd:
@@ -312,6 +317,7 @@ def _add_movimentacao(request, pk, tipo_mov):
             valor=valor,
             quantidade=quantidade,
             pu_na_data=pu_na_data,
+            taxa_na_data=taxa_na_data,
             observacao=observacao,
         )
         investimento.recalc()
@@ -330,6 +336,9 @@ def investment_detail(request, pk):
     )
     is_tesouro = bool(tesouro.parse_ticker(investimento.ticker))
     is_brapi = bool(investimento.ticker) and not is_tesouro
+    if is_tesouro:
+        # Marcação na curva avança a cada dia — recalcula para refletir hoje.
+        investimento.recalc()
     return render(request, "investments/detail.html", {
         "investimento": investimento,
         "movimentacoes": investimento.movimentacoes.all(),
@@ -353,32 +362,51 @@ def investment_history(request, pk):
     points = []
 
     if tesouro_key:
-        tipo, vencimento_iso = tesouro_key
-        from datetime import date as _date
-        vencimento = _date.fromisoformat(vencimento_iso)
-        serie = TesouroPrecoHistorico.objects.filter(
-            tipo=tipo,
-            vencimento=vencimento,
-            data__gte=primeira_data,
-        ).order_by("data").values("data", "pu_venda")
+        # Marcação na curva: cada lote de compra cresce à taxa contratada e
+        # nunca decresce. Geramos uma grade de datas (≈90 pontos) e avaliamos
+        # a posição em cada uma, em vez de seguir o PU de mercado.
+        hoje = date_cls.today()
+        total_days = max((hoje - primeira_data).days, 0)
+        step = max(1, total_days // 90)
+        grid = set()
+        d = primeira_data
+        while d <= hoje:
+            grid.add(d)
+            d += timedelta(days=step)
+        grid.add(hoje)
+        for m in movs:
+            if primeira_data <= m.data <= hoje:
+                grid.add(m.data)
 
-        qtd = Decimal("0")
-        custo = Decimal("0")
-        mov_idx = 0
-        for h in serie:
-            while mov_idx < len(movs) and movs[mov_idx].data <= h["data"]:
-                m = movs[mov_idx]
+        for alvo in sorted(grid):
+            lotes = []  # [qtd_restante, pu, taxa, data]
+            custo = Decimal("0")
+            for m in movs:
+                if m.data > alvo:
+                    break
                 if m.tipo == "compra":
-                    qtd += m.quantidade
+                    lotes.append([m.quantidade, m.pu_na_data, m.taxa_na_data, m.data])
                     custo += m.valor
                 else:
-                    qtd -= m.quantidade
                     custo -= m.valor
-                mov_idx += 1
-            valor = (qtd * h["pu_venda"]).quantize(Decimal("0.01"))
+                    restante = m.quantidade
+                    for lote in lotes:
+                        if restante <= 0:
+                            break
+                        consumido = min(lote[0], restante)
+                        lote[0] -= consumido
+                        restante -= consumido
+            valor = Decimal("0")
+            for qtd, pu, taxa, d_lote in lotes:
+                if qtd <= 0:
+                    continue
+                if pu is None or taxa is None:
+                    valor += qtd * (pu or Decimal("0"))
+                else:
+                    valor += qtd * tesouro.pu_na_curva(pu, taxa, (alvo - d_lote).days)
             points.append({
-                "date": h["data"].isoformat(),
-                "valor": float(valor),
+                "date": alvo.isoformat(),
+                "valor": float(valor.quantize(Decimal("0.01"))),
                 "custo": float(custo),
             })
         serie_tipo = "tesouro"

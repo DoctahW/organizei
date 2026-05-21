@@ -81,6 +81,7 @@ def sync_from_csv():
                 data=row["data"],
                 pu_compra=row["pu_compra"],
                 pu_venda=row["pu_venda"],
+                taxa_compra=row["taxa_compra"],
             ))
             existing_history.add(hkey)
 
@@ -176,6 +177,48 @@ def get_pu_on_date(tipo, vencimento_iso, data_alvo, *, side="venda"):
             "Verifique se a data não é anterior à existência do título."
         )
     return registro[field]
+
+
+DIAS_ANO = Decimal("365")
+
+
+def get_taxa_on_date(tipo, vencimento_iso, data_alvo):
+    """Retorna a taxa anual (%) contratada do título numa data específica.
+
+    Usada para fixar a taxa da marcação na curva no momento da compra.
+    Se a data exata não existir, usa o último dia útil anterior; se não
+    houver histórico de taxa, cai para a taxa atual do título.
+    """
+    ensure_fresh()
+    vencimento = date.fromisoformat(vencimento_iso) if isinstance(vencimento_iso, str) else vencimento_iso
+    taxa = (
+        TesouroPrecoHistorico.objects
+        .filter(tipo=tipo, vencimento=vencimento, data__lte=data_alvo, taxa_compra__isnull=False)
+        .order_by("-data")
+        .values_list("taxa_compra", flat=True)
+        .first()
+    )
+    if taxa is not None:
+        return taxa
+    titulo = TesouroTitulo.objects.filter(tipo=tipo, vencimento=vencimento).first()
+    if titulo is not None:
+        return titulo.taxa_compra
+    raise ValueError(f"Sem taxa disponível para {tipo} venc {vencimento_iso}.")
+
+
+def pu_na_curva(pu_inicial, taxa_pct, dias_corridos):
+    """PU pela marcação na curva: cresce ``pu_inicial`` à taxa anual contratada.
+
+    Diferente do PU de mercado, é monotônico — nunca decresce —, refletindo
+    o rendimento contratado. Para títulos IPCA+ a ``taxa_pct`` é a taxa real,
+    então o crescimento desconsidera a inflação acumulada (aproximação).
+    """
+    pu_inicial = Decimal(pu_inicial)
+    if dias_corridos <= 0 or taxa_pct is None:
+        return pu_inicial
+    taxa = Decimal(taxa_pct) / Decimal("100")
+    fator = (Decimal("1") + taxa) ** (Decimal(dias_corridos) / DIAS_ANO)
+    return pu_inicial * fator
 
 
 def make_ticker(tipo, vencimento_iso):
